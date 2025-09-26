@@ -9,30 +9,33 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/diseases")
+@RequestMapping("/api/disease")
 @RequiredArgsConstructor
 public class DiseaseController {
     private final DiseaseService diseaseService;
 
-    @GetMapping
-    public ResponseEntity<List<DiseaseDTO>> getAllDiseases() {
-        return ResponseEntity.ok(diseaseService.getAllDiseases());
+    @PostMapping
+    public ResponseEntity<DiseaseDTO> create(@RequestBody DiseaseDTO dto) {
+        return ResponseEntity.ok(diseaseService.createDisease(dto));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DiseaseDTO> getDiseaseById(@PathVariable Long id) {
-        DiseaseDTO dto = diseaseService.getDiseaseById(id);
-        if (dto == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(dto);
+    public ResponseEntity<DiseaseDTO> get(@PathVariable Long id) {
+        return ResponseEntity.ok(diseaseService.getDiseaseById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<DiseaseDTO> createDisease(@RequestBody DiseaseDTO dto) {
-        return ResponseEntity.ok(diseaseService.saveDisease(dto));
+    @GetMapping
+    public ResponseEntity<List<DiseaseDTO>> getAll() {
+        return ResponseEntity.ok(diseaseService.getAllDiseases());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DiseaseDTO> update(@PathVariable Long id, @RequestBody DiseaseDTO dto) {
+        return ResponseEntity.ok(diseaseService.updateDisease(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDisease(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         diseaseService.deleteDisease(id);
         return ResponseEntity.noContent().build();
     }

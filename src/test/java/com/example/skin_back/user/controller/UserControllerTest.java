@@ -22,4 +22,20 @@ class UserControllerTest {
         mockMvc.perform(get("/api/user"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void testCreateUser() throws Exception {
+        UserDTO dto = UserDTO.builder()
+            .username("testuser")
+            .password("testpass")
+            .role("USER")
+            .email("testuser@example.com")
+            .phoneNumber("01012345678")
+            .build();
+        mockMvc.perform(post("/api/user")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username").value("testuser"));
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.skin_back.disease.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

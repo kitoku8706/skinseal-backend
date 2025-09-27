@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.AllArgsConstructor;
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -14,23 +14,22 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "SS_APPOINTMENT")
+@Table(name = "ss_appointment")
 public class AppointmentEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "appointment_seq_generator")
-    @SequenceGenerator(name = "appointment_seq_generator", sequenceName = "APPOINTMENT_ID_SEQ", allocationSize = 1)
-    @Column(name = "APPOINTMENT_ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "appointment_id")
     private Long appointmentId;
 
-    @Column(name = "USER_ID", nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "APPOINTMENT_DATE", nullable = false)
+    @Column(name = "appointment_date", nullable = false)
     private LocalDate appointmentDate;
 
-    @Column(name = "APPOINTMENT_TIME", nullable = false)
-    private LocalTime appointmentTime;
+    @Column(name = "appointment_time", nullable = false)
+    private String appointmentTime;
 
-    @Column(name = "PURPOSE")
+    @Column(name = "purpose")
     private String purpose;
 }

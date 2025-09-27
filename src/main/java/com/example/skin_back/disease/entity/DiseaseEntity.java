@@ -1,6 +1,7 @@
 package com.example.skin_back.disease.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,23 +13,22 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "DISEASE")
+@Table(name = "disease")
 public class DiseaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "disease_seq_generator")
-    @SequenceGenerator(name = "disease_seq_generator", sequenceName = "DISEASE_ID_SEQ", allocationSize = 1)
-    @Column(name = "DISEASE_ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "disease_id")
     private Long diseaseId;
 
-    @Column(name = "DISEASE_NAME", nullable = false)
+    @Column(name = "disease_name", nullable = false)
     private String diseaseName;
 
-    @Column(name = "DESCRIPTION", columnDefinition = "CLOB")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "SYMPTOMS")
+    @Column(name = "symptoms")
     private String symptoms;
 
-    @Column(name = "CAUSES")
+    @Column(name = "causes")
     private String causes;
 }

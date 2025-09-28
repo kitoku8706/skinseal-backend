@@ -9,4 +9,6 @@ public interface UserService {
     List<UserDTO> getAllUsers();
     UserDTO updateUser(Long userId, UserDTO userDTO);
     void deleteUser(Long userId);
+    boolean existsByEmail(String email);
+    boolean login(String email, String password);
 }

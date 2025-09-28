@@ -1,6 +1,7 @@
 package com.example.skin_back.user.controller;
 
 import com.example.skin_back.user.dto.UserDTO;
+import com.example.skin_back.user.dto.UserLoginRequest;
 import com.example.skin_back.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class UserController {
     private final UserService userService;
 
@@ -37,5 +39,17 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean exists = userService.existsByEmail(email);
+        return ResponseEntity.ok(exists);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Boolean> login(@RequestBody UserLoginRequest request) {
+        boolean success = userService.login(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok(success);
     }
 }

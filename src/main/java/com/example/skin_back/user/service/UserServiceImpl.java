@@ -16,10 +16,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO createUser(UserDTO userDTO) {
         UserEntity entity = UserEntity.builder()
-                .username(userDTO.getUsername())
+                .email(userDTO.getEmail())
                 .password(userDTO.getPassword())
                 .role(userDTO.getRole())
-                .email(userDTO.getEmail())
                 .phoneNumber(userDTO.getPhoneNumber())
                 .build();
         UserEntity saved = userRepository.save(entity);
@@ -44,10 +43,9 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUser(Long userId, UserDTO userDTO) {
         return userRepository.findById(userId)
                 .map(entity -> {
-                    entity.setUsername(userDTO.getUsername());
+                    entity.setEmail(userDTO.getEmail());
                     entity.setPassword(userDTO.getPassword());
                     entity.setRole(userDTO.getRole());
-                    entity.setEmail(userDTO.getEmail());
                     entity.setPhoneNumber(userDTO.getPhoneNumber());
                     return toDTO(userRepository.save(entity));
                 })
@@ -59,13 +57,24 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.findByEmail(email) != null;
+    }
+
+    @Override
+    public boolean login(String email, String password) {
+        UserEntity user = userRepository.findByEmail(email);
+        if (user == null) return false;
+        return user.getPassword().equals(password);
+    }
+
     private UserDTO toDTO(UserEntity entity) {
         return UserDTO.builder()
                 .userId(entity.getUserId())
-                .username(entity.getUsername())
+                .email(entity.getEmail())
                 .password(entity.getPassword())
                 .role(entity.getRole())
-                .email(entity.getEmail())
                 .phoneNumber(entity.getPhoneNumber())
                 .build();
     }

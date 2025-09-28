@@ -20,17 +20,14 @@ public class UserEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "username", unique = true, nullable = false)
-    private String username;
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
 
     @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "role", nullable = false)
     private String role;
-
-    @Column(name = "email", nullable = false)
-    private String email;
 
     @Column(name = "phone_number")
     private String phoneNumber;

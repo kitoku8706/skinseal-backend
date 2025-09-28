@@ -1,0 +1,9 @@
+package com.example.skin_back.user.dto;
+
+import lombok.Data;
+
+@Data
+public class UserLoginRequest {
+    private String email;
+    private String password;
+}

@@ -2,16 +2,19 @@ package com.example.skin_back.appointment.controller;
 
 import com.example.skin_back.appointment.dto.AppointmentDTO;
 import com.example.skin_back.appointment.service.AppointmentService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/appointment")
-@RequiredArgsConstructor
 public class AppointmentController {
-    private final AppointmentService appointmentService;
+    
+    private final AppointmentService appointmentService; 
+
+    public AppointmentController(AppointmentService appointmentService) {
+        this.appointmentService = appointmentService;
+    }
 
     @PostMapping
     public ResponseEntity<AppointmentDTO> create(@RequestBody AppointmentDTO dto) {

@@ -26,10 +26,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserById(Long userId) {
-        return userRepository.findById(userId)
-                .map(this::toDTO)
-                .orElse(null);
+    public UserDTO getUserByEmail(String email) {
+        UserEntity entity = userRepository.findByEmail(email);
+        return entity != null ? toDTO(entity) : null;
     }
 
     @Override
@@ -40,26 +39,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO updateUser(Long userId, UserDTO userDTO) {
-        return userRepository.findById(userId)
-                .map(entity -> {
-                    entity.setEmail(userDTO.getEmail());
-                    entity.setPassword(userDTO.getPassword());
-                    entity.setRole(userDTO.getRole());
-                    entity.setPhoneNumber(userDTO.getPhoneNumber());
-                    return toDTO(userRepository.save(entity));
-                })
-                .orElse(null);
+    public UserDTO updateUser(String email, UserDTO userDTO) {
+        UserEntity entity = userRepository.findByEmail(email);
+        if (entity == null) return null;
+        entity.setPassword(userDTO.getPassword());
+        entity.setRole(userDTO.getRole());
+        entity.setPhoneNumber(userDTO.getPhoneNumber());
+        return toDTO(userRepository.save(entity));
     }
 
     @Override
-    public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
+    public void deleteUser(String email) {
+        UserEntity entity = userRepository.findByEmail(email);
+        if (entity != null) userRepository.delete(entity);
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return userRepository.findByEmail(email) != null;
+        try {
+            return userRepository.findByEmail(email) != null;
+        } catch (Exception e) {
+            // DB 오류 등 발생 시 false 반환
+            return false;
+        }
     }
 
     @Override
@@ -71,7 +73,6 @@ public class UserServiceImpl implements UserService {
 
     private UserDTO toDTO(UserEntity entity) {
         return UserDTO.builder()
-                .userId(entity.getUserId())
                 .email(entity.getEmail())
                 .password(entity.getPassword())
                 .role(entity.getRole())

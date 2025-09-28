@@ -20,9 +20,9 @@ public class UserController {
         return ResponseEntity.ok(userService.createUser(dto));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> get(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    @GetMapping("/{email}")
+    public ResponseEntity<UserDTO> get(@PathVariable String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
     @GetMapping
@@ -30,19 +30,22 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO dto) {
-        return ResponseEntity.ok(userService.updateUser(id, dto));
+    @PutMapping("/{email}")
+    public ResponseEntity<UserDTO> update(@PathVariable String email, @RequestBody UserDTO dto) {
+        return ResponseEntity.ok(userService.updateUser(email, dto));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        userService.deleteUser(id);
+    @DeleteMapping("/{email}")
+    public ResponseEntity<Void> delete(@PathVariable String email) {
+        userService.deleteUser(email);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/check-email")
     public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(false);
+        }
         boolean exists = userService.existsByEmail(email);
         return ResponseEntity.ok(exists);
     }

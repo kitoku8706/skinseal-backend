@@ -5,10 +5,10 @@ import java.util.List;
 
 public interface UserService {
     UserDTO createUser(UserDTO userDTO);
-    UserDTO getUserById(Long userId);
+    UserDTO getUserByEmail(String email);
     List<UserDTO> getAllUsers();
-    UserDTO updateUser(Long userId, UserDTO userDTO);
-    void deleteUser(Long userId);
+    UserDTO updateUser(String email, UserDTO userDTO);
+    void deleteUser(String email);
     boolean existsByEmail(String email);
     boolean login(String email, String password);
 }

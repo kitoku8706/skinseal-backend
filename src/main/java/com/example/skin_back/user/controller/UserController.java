@@ -1,11 +1,14 @@
 package com.example.skin_back.user.controller;
 
+import com.example.skin_back.user.dto.ErrorResponse;
+import com.example.skin_back.user.dto.LoginResponse;
 import com.example.skin_back.user.dto.UserDTO;
 import com.example.skin_back.user.dto.UserLoginRequest;
 import com.example.skin_back.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -16,8 +19,15 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDTO> create(@RequestBody UserDTO dto) {
-        return ResponseEntity.ok(userService.createUser(dto));
+    public ResponseEntity<?> create(@RequestBody UserDTO dto) {
+        try {
+            UserDTO created = userService.createUser(dto);
+            return ResponseEntity.status(201).body(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(409).body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorResponse("서버 오류"));
+        }
     }
 
     @GetMapping("/{email}")
@@ -42,17 +52,24 @@ public class UserController {
     }
 
     @GetMapping("/check-email")
-    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+    public ResponseEntity<?> checkEmail(@RequestParam("email") String email) {
         if (email == null || email.trim().isEmpty()) {
             return ResponseEntity.badRequest().body(false);
         }
-        boolean exists = userService.existsByEmail(email);
-        return ResponseEntity.ok(exists);
+        try {
+            boolean exists = userService.existsByEmail(email);
+            return ResponseEntity.ok(exists);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("이메일 중복확인 중 서버 오류: " + e.getMessage());
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Boolean> login(@RequestBody UserLoginRequest request) {
-        boolean success = userService.login(request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(success);
+    public ResponseEntity<?> login(@RequestBody UserLoginRequest request) {
+        LoginResponse response = userService.loginWithInfo(request.getEmail(), request.getPassword());
+        if (!response.success) {
+            return ResponseEntity.status(401).body(response);
+        }
+        return ResponseEntity.ok(response);
     }
 }

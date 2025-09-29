@@ -44,7 +44,7 @@ class UserControllerTest {
         mockMvc.perform(post("/api/user")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(dto)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated()) // 201로 수정
             .andExpect(jsonPath("$.email").value(uniqueEmail));
     }
 
@@ -61,7 +61,7 @@ class UserControllerTest {
         String response = mockMvc.perform(post("/api/user")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(dto)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated()) // 201로 수정
             .andReturn().getResponse().getContentAsString();
         UserDTO created = objectMapper.readValue(response, UserDTO.class);
         // 회원정보수정
@@ -86,16 +86,15 @@ class UserControllerTest {
         String response = mockMvc.perform(post("/api/user")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(dto)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated()) // 201로 수정
             .andReturn().getResponse().getContentAsString();
         UserDTO created = objectMapper.readValue(response, UserDTO.class);
         // 회원탈퇴
         mockMvc.perform(delete("/api/user/" + created.getEmail()))
             .andExpect(status().isNoContent());
-        // 탈퇴 후 조회 시 null 또는 404
+        // 탈퇴 후 조회 시 404 반환
         mockMvc.perform(get("/api/user/" + created.getEmail()))
-            .andExpect(status().isOk())
-            .andExpect(content().string(""));
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -111,14 +110,14 @@ class UserControllerTest {
         mockMvc.perform(post("/api/user")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(dto)))
-            .andExpect(status().isOk());
+            .andExpect(status().isCreated()); // 201로 수정
         // 로그인 요청
         String loginRequest = "{\"email\":\"" + email + "\",\"password\":\"testpass\"}";
         mockMvc.perform(post("/api/user/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(loginRequest))
             .andExpect(status().isOk())
-            .andExpect(content().string("true"));
+            .andExpect(jsonPath("$.success").value(true)); // LoginResponse.success로 검증
     }
 
     @Test
@@ -134,7 +133,7 @@ class UserControllerTest {
         mockMvc.perform(post("/api/user")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(dto)))
-            .andExpect(status().isOk());
+            .andExpect(status().isCreated()); // 201로 수정
         // 가입된 이메일 중복확인: true 반환
         mockMvc.perform(get("/api/user/check-email").param("email", email))
             .andExpect(status().isOk())

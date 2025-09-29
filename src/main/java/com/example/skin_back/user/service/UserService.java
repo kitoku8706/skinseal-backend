@@ -1,6 +1,7 @@
 package com.example.skin_back.user.service;
 
 import com.example.skin_back.user.dto.UserDTO;
+import com.example.skin_back.user.dto.LoginResponse;
 import java.util.List;
 
 public interface UserService {
@@ -11,4 +12,5 @@ public interface UserService {
     void deleteUser(String email);
     boolean existsByEmail(String email);
     boolean login(String email, String password);
+    LoginResponse loginWithInfo(String email, String password);
 }

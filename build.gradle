@@ -26,31 +26,54 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
+	// 'spring-boot-starter-web' 중복 제거됨
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	
+	// 'compileOnly'와 'annotationProcessor'의 중복 선언 제거됨 (아래쪽에 통합)
+	
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	//runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	annotationProcessor 'org.projectlombok:lombok'
+	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
-	 // 스프링 부트 프로젝트에 필요한 종속성
+	
+	// 스프링 부트 프로젝트에 필요한 종속성 (중복 제거 후 유지)
     implementation("org.springframework.boot:spring-boot-starter-web")
     
-    // Google GenAI SDK (Gemini) 종속성 추가
-    //implementation("com.google.cloud:google-cloud-ai-platform:3.27.0") // 최신 버전 확인 필요
+    // Google GenAI SDK (Gemini) 종속성 추가 (주석 처리)
+    //implementation("com.google.cloud:google-cloud-ai-platform:3.27.0") 
     
-    // Lombok을 컴파일 시에만 사용하도록 설정
+    // Lombok 통합 설정
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     // Spring Boot Starter Test 사용 시에도 Lombok 포함
     testImplementation 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
-    //
+    
+    // JWT 인증을 위한 jjwt 라이브러리 의존성 추가
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    
+    // 서블릿 필터를 사용하기 위한 Jakarta Servlet API 의존성 추가
+    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// -----------------------------------------------------
+// 💡 [필수 추가] 컴파일러에 매개변수 이름 정보를 포함하도록 설정
+// -----------------------------------------------------
+tasks.named('compileJava') {
+    options.compilerArgs.add('-parameters')
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-parameters'
 }

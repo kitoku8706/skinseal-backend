@@ -1,7 +1,11 @@
 package com.example.skin_back.user.entity;
 
+import com.example.skin_back.user.constant.UserRole;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,8 +38,9 @@ public class UserEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private String role; // 또는 @Enumerated(EnumType.STRING)으로 enum 타입 사용
+    private UserRole role; // 또는 @Enumerated(EnumType.STRING)으로 enum 타입 사용
 
     @Column(name = "email", nullable = false)
     private String email;

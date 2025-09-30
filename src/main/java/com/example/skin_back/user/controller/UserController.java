@@ -25,8 +25,7 @@ public class UserController {
 	
 	@PostMapping(value = "/member/signup")
 	public ResponseEntity<AuthInfo> addMember(@RequestBody UserDTO userDTO){
-		
-		
-		return null;
+		AuthInfo result = userService.addMemberProcess(userDTO);
+		return ResponseEntity.ok(result);
 	}
 }

@@ -29,9 +29,11 @@ public class UserController {
 	// 회원가입
 	@PostMapping(value = "/member/signup")
 	public ResponseEntity<AuthInfo> addMember(@RequestBody UserDTO userDTO){
+
 		AuthInfo authInfo = userService.addMemberProcess(userDTO);
 		
 		return ResponseEntity.ok(authInfo);
+
 	}
 	
     // 로그인

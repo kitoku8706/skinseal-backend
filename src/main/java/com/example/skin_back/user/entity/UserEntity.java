@@ -1,29 +1,44 @@
 package com.example.skin_back.user.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
+@Entity
+@Table(name = "ss_user")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "ss_user")
 public class UserEntity {
     @Id
-    @Column(name = "email", unique = true, nullable = false)
-    private String email;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ss_user_seq")
+    @SequenceGenerator(name = "ss_user_seq", sequenceName = "ss_user_seq", allocationSize = 1)
+    private Long userId;
+
+    @Column(name = "username", unique = true, nullable = false)
+    private String username;
 
     @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "role", nullable = false)
-    private String role;
+    private String role; // 또는 @Enumerated(EnumType.STRING)으로 enum 타입 사용
+
+    @Column(name = "email", nullable = false)
+    private String email;
 
     @Column(name = "phone_number")
     private String phoneNumber;

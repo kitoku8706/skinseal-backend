@@ -145,4 +145,23 @@ class UserControllerTest {
             .andExpect(status().isOk())
             .andExpect(content().string("false"));
     }
+
+    @Test
+    void testSignupUser() throws Exception {
+        String uniqueEmail = "signupuser_" + System.currentTimeMillis() + "@example.com";
+        UserDTO dto = UserDTO.builder()
+            .username("signupuser")
+            .email(uniqueEmail)
+            .password("signupPass123!")
+            .role("USER")
+            .phoneNumber("01098765432")
+            .build();
+        String response = mockMvc.perform(post("/member/signup")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+        AuthInfo result = objectMapper.readValue(response, AuthInfo.class);
+        org.assertj.core.api.Assertions.assertThat(result.getEmail()).isEqualTo(uniqueEmail);
+    }
 }

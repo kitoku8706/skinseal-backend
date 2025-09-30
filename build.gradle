@@ -6,7 +6,6 @@ plugins {
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
 
 java {
 	toolchain {
@@ -48,7 +47,12 @@ dependencies {
     // Spring Boot Starter Test 사용 시에도 Lombok 포함
     testImplementation 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
-    //
+    
+    //spring security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	
+	//jwt
+	implementation 'com.auth0:java-jwt:4.5.0'
 }
 
 tasks.named('test') {

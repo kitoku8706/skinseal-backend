@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.skin_back.user.dto.AuthInfo;
 import com.example.skin_back.user.dto.UserDTO;
+import com.example.skin_back.user.repository.UserRepository;
 import com.example.skin_back.user.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 public class UserController {
+
+    private UserRepository userRepository;
 	
 	@Autowired
 	private UserService userService;
@@ -22,11 +25,21 @@ public class UserController {
 	public UserController() {
 	
 	}
-	
+		
+	// 회원가입
 	@PostMapping(value = "/member/signup")
 	public ResponseEntity<AuthInfo> addMember(@RequestBody UserDTO userDTO){
+		AuthInfo authInfo = userService.addMemberProcess(userDTO);
 		
-		
-		return null;
+		return ResponseEntity.ok(authInfo);
 	}
+	
+    // 로그인
+    @PostMapping(value = "/member/login")
+    public ResponseEntity<AuthInfo> login(@RequestBody UserDTO userDTO){
+        AuthInfo authInfo = userService.loginProcess(userDTO);
+        
+        return ResponseEntity.ok(authInfo); 
+    }
+	
 }

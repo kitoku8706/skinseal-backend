@@ -1,5 +1,7 @@
 package com.example.skin_back.user.dto;
 
+import com.example.skin_back.user.constant.UserRole;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -11,7 +13,7 @@ public class AuthInfo {
 	private Long userId;
 	private String username;
 	private String password;
-	private String role;
+	private UserRole role;
 	private String email;
 	private String phoneNumber;
 	
@@ -19,16 +21,7 @@ public class AuthInfo {
 		
 	}
 
-	public AuthInfo(String username, String password, String role, String email, String phoneNumber) {
-		super();
-		this.username = username;
-		this.password = password;
-		this.role = role;
-		this.email = email;
-		this.phoneNumber = phoneNumber;
-	}
-
-	public AuthInfo(Long userId, String username, String password, String role, String email, String phoneNumber) {
+	public AuthInfo(Long userId, String username, String password, UserRole role, String email, String phoneNumber) {
 		super();
 		this.userId = userId;
 		this.username = username;
@@ -37,8 +30,5 @@ public class AuthInfo {
 		this.email = email;
 		this.phoneNumber = phoneNumber;
 	}
-	
-	
-	
 		
 }

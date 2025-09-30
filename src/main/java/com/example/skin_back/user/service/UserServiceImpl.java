@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.skin_back.user.constant.UserRole;
 import com.example.skin_back.user.dto.AuthInfo;
 import com.example.skin_back.user.dto.UserDTO;
 import com.example.skin_back.user.entity.UserEntity;
@@ -31,6 +32,8 @@ public class UserServiceImpl implements UserService {
 			throw new RuntimeException("이미 존재하는 사용자 이름입니다.");
 		}
 
+		dto.setRole(UserRole.USER);
+		
 		String encodedPassword = passwordEncoder.encode(dto.getPassword());
 		dto.setPassword(encodedPassword);
 

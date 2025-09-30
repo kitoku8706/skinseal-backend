@@ -1,5 +1,6 @@
 package com.example.skin_back.user.dto;
 
+import com.example.skin_back.user.constant.UserRole;
 import com.example.skin_back.user.entity.UserEntity;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ public class UserDTO {
 	private Long userId;
 	private String username;
 	private String password;
-	private String role;
+	private UserRole role;
 	private String email;
 	private String phoneNumber;
 	

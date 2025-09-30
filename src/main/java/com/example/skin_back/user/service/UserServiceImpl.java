@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.skin_back.user.config.jwt.JwtTokenProvider;
 import com.example.skin_back.user.constant.UserRole;
 import com.example.skin_back.user.dto.AuthInfo;
+import com.example.skin_back.user.dto.AuthResponseDTO;
 import com.example.skin_back.user.dto.UserDTO;
 import com.example.skin_back.user.entity.UserEntity;
 import com.example.skin_back.user.repository.UserRepository;
@@ -24,6 +26,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	@Autowired
+	private JwtTokenProvider jwtTokenProvider;
+
 	@Override
 	public AuthInfo addMemberProcess(UserDTO dto) {
 
@@ -33,7 +38,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		dto.setRole(UserRole.USER);
-		
+
 		String encodedPassword = passwordEncoder.encode(dto.getPassword());
 		dto.setPassword(encodedPassword);
 
@@ -44,7 +49,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public AuthInfo loginProcess(UserDTO dto) {
+	public AuthResponseDTO loginProcess(UserDTO dto) {
 		Optional<UserEntity> userOptional = userRepository.findByUsername(dto.getUsername());
 
 		if (userOptional.isEmpty()) {
@@ -59,8 +64,11 @@ public class UserServiceImpl implements UserService {
 			throw new RuntimeException("비밀번호가 일치하지 않습니다.");
 		}
 
-		return new AuthInfo(userEntity.getUserId(), userEntity.getUsername(), null, userEntity.getRole(),
-				userEntity.getEmail(), userEntity.getPhoneNumber());
+		String token = jwtTokenProvider.createToken(userEntity.getUserId(), userEntity.getRole());
+
+		return AuthResponseDTO.builder().token(token).userId(userEntity.getUserId()).username(userEntity.getUsername())
+				.role(userEntity.getRole()).email(userEntity.getEmail()).phoneNumber(userEntity.getPhoneNumber())
+				.build();
 	}
 
 	public UserServiceImpl() {

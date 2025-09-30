@@ -1,58 +1,60 @@
 package com.example.skin_back.config;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import com.example.skin_back.user.filter.JwtAuthenticationFilter;
-import com.example.skin_back.user.util.JwtUtil;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * Spring Security 설정을 위한 구성 클래스입니다.
- * 모든 요청에 대해 CSRF, HTTP Basic, 폼 로그인을 비활성화하고, 접근을 허용(permitAll)합니다.
- * 이는 JWT 등을 사용하여 인증을 처리하는 REST API 서버 환경에 적합합니다.
+ * JWT 토큰 기반 인증을 사용하는 REST API 서버 환경에 적합하도록 설정합니다.
  */
 @Configuration
 public class SecurityConfig {
-    @Autowired
-    private JwtUtil jwtUtil;
-
+    
+    /**
+     * 핵심 보안 필터 체인(Security Filter Chain)을 정의합니다.
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // 1. CSRF (Cross-Site Request Forgery) 보호 비활성화: 
-            // REST API에서는 세션 기반 인증을 사용하지 않으므로 비활성화합니다.
-            .csrf().disable()
+            // 1. JWT 기반이므로 CSRF, HTTP Basic, 폼 로그인 비활성화
+            // AbstractHttpConfigurer::disable 는 최신 Spring Security 6+에서 권장되는 비활성화 방법입니다.
+            .csrf(AbstractHttpConfigurer::disable)
+            .httpBasic(AbstractHttpConfigurer::disable) 
+            .formLogin(AbstractHttpConfigurer::disable)
             
-            // 2. HTTP Basic 인증 비활성화: 
-            // 브라우저의 강제 로그인 팝업 창(이전에 겪었던 현상)이 뜨는 것을 방지합니다.
-            .httpBasic().disable() 
+            // 2. 세션 정책을 STATELESS로 설정 (토큰 인증을 사용)
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
             
-            // 3. 기본 폼 로그인 비활성화:
-            // Spring Security가 제공하는 기본 로그인 페이지를 사용하지 않습니다.
-            .formLogin().disable()
-            
-            // 4. 세션 관리 정책 설정: JWT 등을 사용할 경우 STATELESS로 설정합니다.
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            // 5. JWT 인증 필터 추가
-            .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
-            
-            // 6. 요청별 접근 권한 설정
-            .authorizeHttpRequests((authz) -> authz
-                .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/user/check-email").permitAll()
+            // 3. 요청별 접근 권한 설정
+            .authorizeHttpRequests(authorize -> authorize
+                // 회원가입, 로그인, 이메일 확인, 공지사항 조회는 인증 없이 허용 (permitAll)
+                .requestMatchers(HttpMethod.POST, "/api/user").permitAll() // 회원가입
+                .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll() // 로그인
+                .requestMatchers(HttpMethod.GET, "/api/user/check-email").permitAll() // 이메일 중복 확인
+                .requestMatchers(HttpMethod.GET, "/api/notice").permitAll() // 공지사항 목록 조회
+                
+                // 위를 제외한 나머지 모든 요청은 반드시 인증 필요 (authenticated)
                 .anyRequest().authenticated()
             );
             
         return http.build();
     }
-}
 
+    /**
+     * 비밀번호 암호화를 위한 BCryptPasswordEncoder Bean을 등록합니다.
+     * 이 Bean은 사용자 비밀번호를 저장하거나 검증할 때 사용됩니다.
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}

@@ -1,5 +1,6 @@
 package com.example.skin_back.user.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,12 @@ public class UserServiceImpl implements UserService {
 		return AuthResponseDTO.builder().token(token).userId(userEntity.getUserId()).username(userEntity.getUsername())
 				.role(userEntity.getRole()).email(userEntity.getEmail()).phoneNumber(userEntity.getPhoneNumber())
 				.build();
+	}
+	
+	@Override
+	public List<UserDTO> getAllUsers() {
+		
+		return List.of();
 	}
 
 	public UserServiceImpl() {

@@ -36,3 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 /.apt_generated_tests/
+
+# Ignore secret properties file
+src/main/resources/application-secret.properties

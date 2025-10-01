@@ -1,5 +1,6 @@
 package com.example.skin_back.user.controller;
 
+import com.example.skin_back.user.constant.UserRole;
 import com.example.skin_back.user.dto.UserDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ class UserControllerTest {
         UserDTO dto = UserDTO.builder()
             .email(uniqueEmail)
             .password("testpass")
-            .role("USER")
+            .role(UserRole.USER)
             .phoneNumber("01012345678")
             .build();
         mockMvc.perform(post("/api/user")
@@ -55,7 +56,7 @@ class UserControllerTest {
         UserDTO dto = UserDTO.builder()
             .email(email)
             .password("testpass")
-            .role("USER")
+            .role(UserRole.USER)
             .phoneNumber("01012345678")
             .build();
         String response = mockMvc.perform(post("/api/user")
@@ -80,7 +81,7 @@ class UserControllerTest {
         UserDTO dto = UserDTO.builder()
             .email(email)
             .password("testpass")
-            .role("USER")
+            .role(UserRole.USER)
             .phoneNumber("01012345678")
             .build();
         String response = mockMvc.perform(post("/api/user")
@@ -105,7 +106,7 @@ class UserControllerTest {
         UserDTO dto = UserDTO.builder()
             .email(email)
             .password("testpass")
-            .role("USER")
+            .role(UserRole.USER)
             .phoneNumber("01012345678")
             .build();
         mockMvc.perform(post("/api/user")
@@ -127,7 +128,7 @@ class UserControllerTest {
         UserDTO dto = UserDTO.builder()
             .email(email)
             .password("testpass")
-            .role("USER")
+            .role(UserRole.USER)
             .phoneNumber("01012345678")
             .build();
         // 회원가입
@@ -152,7 +153,7 @@ class UserControllerTest {
             .username("signupuser")
             .email(uniqueEmail)
             .password("signupPass123!")
-            .role("USER")
+            .role(UserRole.USER)
             .phoneNumber("01098765432")
             .build();
         String response = mockMvc.perform(post("/member/signup")

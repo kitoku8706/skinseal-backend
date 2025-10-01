@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.skin_back.user.dto.AuthInfo;
+import com.example.skin_back.user.dto.AuthResponseDTO;
 import com.example.skin_back.user.dto.UserDTO;
 import com.example.skin_back.user.repository.UserRepository;
 import com.example.skin_back.user.service.UserService;
@@ -38,10 +39,10 @@ public class UserController {
 	
     // 로그인
     @PostMapping(value = "/member/login")
-    public ResponseEntity<AuthInfo> login(@RequestBody UserDTO userDTO){
-        AuthInfo authInfo = userService.loginProcess(userDTO);
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody UserDTO userDTO){
+    	AuthResponseDTO authResponseDTO = userService.loginProcess(userDTO);
         
-        return ResponseEntity.ok(authInfo); 
+        return ResponseEntity.ok(authResponseDTO); 
     }
 	
 }

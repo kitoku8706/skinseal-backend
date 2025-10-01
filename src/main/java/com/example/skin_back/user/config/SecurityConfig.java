@@ -67,9 +67,11 @@ public class SecurityConfig {
             // 5. 요청별 인가(Authorization) 설정
             .authorizeHttpRequests(authorize -> authorize
                 // 회원가입 및 로그인 요청은 인증 없이 허용 (토큰 발급 경로)
-                .requestMatchers("/member/signup", "/member/login", "member/user").permitAll()
+                .requestMatchers("/member/signup", "/member/login", "/member/user").permitAll()
                 // Swagger UI 경로도 허용 (API 테스트 용도)
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                // 공지사항 경로 허용
+                .requestMatchers("/api/notice/**").permitAll()
                 // 그 외 모든 요청은 인증(토큰 검증)을 요구
                 .anyRequest().authenticated()
             );

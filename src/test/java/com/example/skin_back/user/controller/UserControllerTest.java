@@ -153,7 +153,7 @@ class UserControllerTest {
             .username("signupuser")
             .email(uniqueEmail)
             .password("signupPass123!")
-            .role("USER")
+            .role(UserRole.USER)
             .phoneNumber("01098765432")
             .build();
         String response = mockMvc.perform(post("/member/signup")

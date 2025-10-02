@@ -29,8 +29,8 @@ public class UserDTO {
 				.password(password).role(role).email(email).phoneNumber(phoneNumber).build();
 	}
 	
-	public static UserEntity toDTO(UserEntity membersEntity) {
-		return UserEntity.builder().userId(membersEntity.getUserId()).username(membersEntity.getUsername())
+	public static UserDTO toDTO(UserEntity membersEntity) {
+		return UserDTO.builder().userId(membersEntity.getUserId()).username(membersEntity.getUsername())
 				.password(membersEntity.getPassword()).role(membersEntity.getRole()).email(membersEntity.getEmail())
 				.phoneNumber(membersEntity.getPhoneNumber()).build();
 	}

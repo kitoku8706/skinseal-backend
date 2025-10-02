@@ -1,6 +1,7 @@
 package com.example.skin_back.user.controller;
 
 import com.example.skin_back.user.constant.UserRole;
+import com.example.skin_back.user.dto.AuthInfo;
 import com.example.skin_back.user.dto.UserDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

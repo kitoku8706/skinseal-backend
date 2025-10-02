@@ -20,6 +20,7 @@ public class NoticeServiceImpl implements NoticeService {
                 .content(noticeDTO.getContent())
                 .createdAt(noticeDTO.getCreatedAt())
                 .authorId(noticeDTO.getAuthorId())
+                .type(noticeDTO.getType())
                 .build();
         NoticeEntity saved = noticeRepository.save(entity);
         return toDTO(saved);

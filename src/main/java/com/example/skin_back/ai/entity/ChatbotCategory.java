@@ -33,4 +33,8 @@ public class ChatbotCategory {
     private Boolean enabled;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+	public Object getId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

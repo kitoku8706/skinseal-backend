@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 
-@RestController
+
 @RequestMapping("/api/appointment")
+@RestController
 @RequiredArgsConstructor
 public class AppointmentController {
     

@@ -15,8 +15,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
     
-    private final UserRepository userRepository;
-
+	private final UserRepository userRepository;
+	
     // Spring Security의 표준 메서드 (일반적인 Username/Password 로그인 시 사용)
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

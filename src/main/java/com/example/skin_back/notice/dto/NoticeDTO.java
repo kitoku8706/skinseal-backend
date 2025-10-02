@@ -18,4 +18,6 @@ public class NoticeDTO {
     private String content;
     private LocalDateTime createdAt;
     private Long authorId;
+    private String type;
+    
 }

@@ -32,6 +32,9 @@ public class NoticeEntity {
 
     @Column(name = "author_id", nullable = false)
     private Long authorId;
+    
+    @Column(name = "type", nullable = false)
+    private String type;
 
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
     private java.util.List<com.example.skin_back.common.entity.FileAttachmentEntity> attachments;

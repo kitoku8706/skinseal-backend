@@ -79,4 +79,56 @@ class NoticeControllerTest {
         mockMvc.perform(delete("/api/notice/" + noticeId))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    @DisplayName("필수값 누락 시 400 Bad Request 테스트")
+    void createNoticeMissingRequiredFields() throws Exception {
+        // title 누락
+        NoticeDTO dtoNoTitle = NoticeDTO.builder()
+                .content("내용만 있음")
+                .authorId(1L)
+                .build();
+        mockMvc.perform(post("/api/notice")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dtoNoTitle)))
+                .andExpect(status().isBadRequest());
+
+        // content 누락
+        NoticeDTO dtoNoContent = NoticeDTO.builder()
+                .title("제목만 있음")
+                .authorId(1L)
+                .build();
+        mockMvc.perform(post("/api/notice")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dtoNoContent)))
+                .andExpect(status().isBadRequest());
+
+        // authorId 누락
+        NoticeDTO dtoNoAuthor = NoticeDTO.builder()
+                .title("제목")
+                .content("내용")
+                .build();
+        mockMvc.perform(post("/api/notice")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dtoNoAuthor)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 공지사항 접근 시 404 Not Found 테스트")
+    void notFoundNoticeTest() throws Exception {
+        Long notExistId = 999999L;
+        mockMvc.perform(get("/api/notice/" + notExistId))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(put("/api/notice/" + notExistId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(NoticeDTO.builder()
+                        .title("수정")
+                        .content("수정")
+                        .authorId(1L)
+                        .build())))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(delete("/api/notice/" + notExistId))
+                .andExpect(status().isNotFound());
+    }
 }

@@ -19,23 +19,23 @@ public class DiseaseController {
         return ResponseEntity.ok(diseaseService.createDisease(dto));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DiseaseDTO> get(@PathVariable Long id) {
-        return ResponseEntity.ok(diseaseService.getDiseaseById(id));
-    }
-
-    @GetMapping
+    @GetMapping("/list")
     public ResponseEntity<List<DiseaseDTO>> getAll() {
         return ResponseEntity.ok(diseaseService.getAllDiseases());
     }
 
+    @GetMapping("/{id:[0-9]+}")
+    public ResponseEntity<DiseaseDTO> get(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(diseaseService.getDiseaseById(id));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<DiseaseDTO> update(@PathVariable Long id, @RequestBody DiseaseDTO dto) {
+    public ResponseEntity<DiseaseDTO> update(@PathVariable("id") Long id, @RequestBody DiseaseDTO dto) {
         return ResponseEntity.ok(diseaseService.updateDisease(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         diseaseService.deleteDisease(id);
         return ResponseEntity.noContent().build();
     }

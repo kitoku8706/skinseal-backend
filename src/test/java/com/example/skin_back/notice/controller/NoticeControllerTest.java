@@ -131,4 +131,39 @@ class NoticeControllerTest {
         mockMvc.perform(delete("/api/notice/" + notExistId))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @DisplayName("공지사항 조회수 증가 테스트")
+    void increaseViewCountTest() throws Exception {
+        // 1. 공지사항 생성
+        NoticeDTO createDto = NoticeDTO.builder()
+                .title("조회수 증가 테스트")
+                .content("조회수 증가 테스트 내용")
+                .authorId(1L) // 실제 DB에 존재하는 authorId로 변경 필요
+                .type("GENERAL") // 필수 필드 추가
+                .build();
+
+        String createJson = objectMapper.writeValueAsString(createDto);
+
+        ResultActions createResult = mockMvc.perform(post("/api/notice")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(createJson));
+
+        createResult.andExpect(status().isOk())
+                .andExpect(jsonPath("$.noticeId").exists());
+
+        String response = createResult.andReturn().getResponse().getContentAsString();
+        NoticeDTO created = objectMapper.readValue(response, NoticeDTO.class);
+
+        // 2. 공지사항 조회 (조회수 증가 확인)
+        Long noticeId = created.getNoticeId();
+        mockMvc.perform(get("/api/notice/" + noticeId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.views").value(1));
+
+        // 3. 공지사항 재조회 (조회수 증가 확인)
+        mockMvc.perform(get("/api/notice/" + noticeId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.views").value(2));
+    }
 }

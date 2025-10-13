@@ -29,7 +29,11 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public NoticeDTO getNoticeById(Long noticeId) {
         return noticeRepository.findById(noticeId)
-                .map(this::toDTO)
+                .map(entity -> {
+                    entity.setViews(entity.getViews() + 1); // 조회수 증가
+                    noticeRepository.save(entity); // 변경사항 저장
+                    return toDTO(entity);
+                })
                 .orElse(null);
     }
 

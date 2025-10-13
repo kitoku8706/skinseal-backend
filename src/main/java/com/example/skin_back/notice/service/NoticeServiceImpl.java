@@ -69,6 +69,8 @@ public class NoticeServiceImpl implements NoticeService {
                 .content(entity.getContent())
                 .createdAt(entity.getCreatedAt())
                 .authorId(entity.getAuthorId())
+                .type(entity.getType())
+                .views(entity.getViews())
                 .build();
     }
 }

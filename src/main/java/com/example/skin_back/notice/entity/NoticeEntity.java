@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
@@ -27,10 +28,11 @@ public class NoticeEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(name = "author_id", nullable = false)
+    @Column(name = "author_id", nullable = true)
     private Long authorId;
     
     @Column(name = "type", nullable = false)
@@ -38,4 +40,6 @@ public class NoticeEntity {
 
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
     private java.util.List<com.example.skin_back.common.entity.FileAttachmentEntity> attachments;
+    
+
 }

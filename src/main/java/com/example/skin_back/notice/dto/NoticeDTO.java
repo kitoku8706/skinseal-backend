@@ -19,5 +19,5 @@ public class NoticeDTO {
     private LocalDateTime createdAt;
     private Long authorId;
     private String type;
-    
+    private int views;
 }

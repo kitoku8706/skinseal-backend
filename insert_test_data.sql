@@ -1,0 +1,2 @@
+-- Insert test data into ss_user table
+INSERT INTO public.ss_user (user_id, username, email, password, role) VALUES (1, 'test_user', 'test_user@example.com', 'test_password', 'USER') ON CONFLICT DO NOTHING;

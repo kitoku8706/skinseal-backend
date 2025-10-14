@@ -16,6 +16,7 @@ public class NoticeDTO {
     private Long noticeId;
     private String title;
     private String content;
+    private String username;
     private LocalDateTime createdAt;
     private Long authorId;
     private String type;

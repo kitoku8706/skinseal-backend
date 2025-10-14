@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public AuthInfo addMemberProcess(UserDTO dto) {
 
-		if (userRepository.existsByUsername(dto.getUsername())) {
+		if (userRepository.existsByLoginId(dto.getLoginId())) {
 			// 중복 아이디 처리 로직 추가 예정
 			throw new RuntimeException("이미 존재하는 사용자 이름입니다.");
 		}
@@ -47,13 +47,20 @@ public class UserServiceImpl implements UserService {
 
 		userRepository.save(dto.toEntity());
 
-		return new AuthInfo(dto.getUserId(), dto.getUsername(), null, dto.getRole(), dto.getEmail(),
-				dto.getPhoneNumber());
+	    return new AuthInfo(
+	            dto.getUserId(), 
+	            dto.getLoginId(), 
+	            dto.getUsername(),
+	            null,
+	            dto.getEmail(),
+	            dto.getPhoneNumber(),
+	            dto.getRole()
+	    );
 	}
 
 	@Override
 	public AuthResponseDTO loginProcess(UserDTO dto) {
-		Optional<UserEntity> userOptional = userRepository.findByUsername(dto.getUsername());
+		Optional<UserEntity> userOptional = userRepository.findByLoginId(dto.getLoginId());
 
 		if (userOptional.isEmpty()) {
 			// 사용자 없음 처리 로직 추가 예정
@@ -69,9 +76,15 @@ public class UserServiceImpl implements UserService {
 
 		String token = jwtTokenProvider.createToken(userEntity.getUserId(), userEntity.getRole());
 
-		return AuthResponseDTO.builder().token(token).userId(userEntity.getUserId()).username(userEntity.getUsername())
-				.role(userEntity.getRole()).email(userEntity.getEmail()).phoneNumber(userEntity.getPhoneNumber())
-				.build();
+	    return AuthResponseDTO.builder()
+	            .token(token)
+	            .userId(userEntity.getUserId())
+	            .loginId(userEntity.getLoginId()) 
+	            .username(userEntity.getUsername())
+	            .role(userEntity.getRole())
+	            .email(userEntity.getEmail())
+	            .phoneNumber(userEntity.getPhoneNumber())
+	            .build();
 	}
 	
 	@Override
@@ -81,8 +94,8 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public MemberInfoDTO getUserInfo(String username) {
-	    UserEntity userEntity = userRepository.findByUsername(username)
+	public MemberInfoDTO getUserInfo(String loginId) {
+	    UserEntity userEntity = userRepository.findByLoginId(loginId)
 	            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
 	    return MemberInfoDTO.fromEntity(userEntity);
@@ -90,7 +103,7 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public void updateMemberInfo(String username, MemberUpdateDTO dto) {
-		UserEntity userEntity = userRepository.findByUsername(username)
+		UserEntity userEntity = userRepository.findByLoginId(username)
 	            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
 	    // 1. 비밀번호 변경 로직
@@ -109,6 +122,11 @@ public class UserServiceImpl implements UserService {
 	    userEntity.setPhoneNumber(dto.getPhoneNumber());
 	    userEntity.setEmail(dto.getEmail());
 		
+	}
+	
+	@Override
+	public boolean checkLoginIdDuplicate(String loginId) {
+		return userRepository.existsByLoginId(loginId);
 	}
 
 	public UserServiceImpl() {

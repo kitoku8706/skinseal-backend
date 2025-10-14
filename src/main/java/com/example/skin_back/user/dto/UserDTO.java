@@ -18,21 +18,23 @@ import lombok.ToString;
 @ToString
 public class UserDTO {
 	private Long userId;
+	private String loginId;
 	private String username;
 	private String password;
-	private UserRole role;
+	private String birth;
 	private String email;
 	private String phoneNumber;
+	private UserRole role;
 	
 	public UserEntity toEntity() {
-		return UserEntity.builder().userId(userId).username(username)
-				.password(password).role(role).email(email).phoneNumber(phoneNumber).build();
+		return UserEntity.builder().userId(userId).loginId(loginId).username(username)
+				.password(password).birth(birth).email(email).phoneNumber(phoneNumber).role(role).build();
 	}
 	
 	public static UserDTO toDTO(UserEntity membersEntity) {
-		return UserDTO.builder().userId(membersEntity.getUserId()).username(membersEntity.getUsername())
-				.password(membersEntity.getPassword()).role(membersEntity.getRole()).email(membersEntity.getEmail())
-				.phoneNumber(membersEntity.getPhoneNumber()).build();
+		return UserDTO.builder().userId(membersEntity.getUserId()).loginId(membersEntity.getLoginId()).username(membersEntity.getUsername())
+				.password(membersEntity.getPassword()).birth(membersEntity.getBirth()).email(membersEntity.getEmail())
+				.phoneNumber(membersEntity.getPhoneNumber()).role(membersEntity.getRole()).build();
 	}
 	
 }

@@ -1,10 +1,6 @@
 package com.example.skin_back.intro.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 @Getter
 @Setter

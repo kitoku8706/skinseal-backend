@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.skin_back.user.config.CustomUserDetails;
 import com.example.skin_back.user.dto.AuthInfo;
 import com.example.skin_back.user.dto.AuthResponseDTO;
+import com.example.skin_back.user.dto.IdCheckResponse;
+import com.example.skin_back.user.dto.LoginIdCheckDTO;
 import com.example.skin_back.user.dto.MemberInfoDTO;
 import com.example.skin_back.user.dto.MemberUpdateDTO;
 import com.example.skin_back.user.dto.UserDTO;
@@ -65,30 +67,30 @@ public class UserController {
         return ResponseEntity.ok(authResponseDTO); 
     }
     
-    private String getAuthenticatedUsername() {
+    private String getAuthenticatedLoginId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new IllegalStateException("인증된 사용자 정보가 없습니다.");
         }
         Object principal = authentication.getPrincipal();
         if (principal instanceof CustomUserDetails) {
-            return ((CustomUserDetails) principal).getUserEntity().getUsername();
+            return ((CustomUserDetails) principal).getUserEntity().getLoginId();
         }
         return ((UserDetails) principal).getUsername();
     }
     
     @GetMapping("/info")
     public ResponseEntity<MemberInfoDTO> getUserInfo() {
-        String username = getAuthenticatedUsername();
-        MemberInfoDTO userInfo = userService.getUserInfo(username);
+        String loginId = getAuthenticatedLoginId();
+        MemberInfoDTO userInfo = userService.getUserInfo(loginId);
         return ResponseEntity.ok(userInfo);
     }
     
     @PutMapping("/update")
     public ResponseEntity<String> updateMember(@RequestBody MemberUpdateDTO updateDto) {
         try {
-            String username = getAuthenticatedUsername();
-            userService.updateMemberInfo(username, updateDto);
+            String loginId = getAuthenticatedLoginId();
+            userService.updateMemberInfo(loginId, updateDto);
             
             return ResponseEntity.ok("회원정보가 성공적으로 수정되었습니다.");
         } catch (RuntimeException e) {
@@ -96,6 +98,20 @@ public class UserController {
             // 비밀번호 불일치 등 사용자 정의 예외 처리
             return ResponseEntity.badRequest().body("정보 수정 실패: " + e.getMessage());
         }
+    }
+    
+    @PostMapping("/id-check")
+    public ResponseEntity<IdCheckResponse> checkIdDuplicate(@RequestBody LoginIdCheckDTO checkDTO) {
+        
+        String loginId = checkDTO.getLoginId(); 
+
+        if (loginId == null || loginId.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(new IdCheckResponse(true));
+        }
+        
+        boolean isDuplicate = userService.checkLoginIdDuplicate(loginId);
+        
+        return ResponseEntity.ok(new IdCheckResponse(isDuplicate));
     }
 	
 }

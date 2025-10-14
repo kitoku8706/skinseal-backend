@@ -5,11 +5,14 @@ import com.example.skin_back.intro.entity.IntroEntity;
 import com.example.skin_back.intro.repository.IntroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class IntroServiceImpl implements IntroService {
     private final IntroRepository introRepository;
 
@@ -25,13 +28,15 @@ public class IntroServiceImpl implements IntroService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public IntroDTO getIntroById(Long infoId) {
         return introRepository.findById(infoId)
                 .map(this::toDTO)
-                .orElse(null);
+                .orElseThrow(() -> new RuntimeException("해당 ID의 소개 정보가 없습니다: " + infoId));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<IntroDTO> getAllIntros() {
         return introRepository.findAll().stream()
                 .map(this::toDTO)
@@ -39,6 +44,7 @@ public class IntroServiceImpl implements IntroService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<IntroDTO> getIntrosByMenuType(String menuType) {
         return introRepository.findByMenuType(menuType).stream()
                 .map(this::toDTO)
@@ -54,7 +60,7 @@ public class IntroServiceImpl implements IntroService {
                     entity.setMenuType(introDTO.getMenuType());
                     return toDTO(introRepository.save(entity));
                 })
-                .orElse(null);
+                .orElseThrow(() -> new RuntimeException("해당 ID의 소개 정보가 없습니다: " + infoId));
     }
 
     @Override

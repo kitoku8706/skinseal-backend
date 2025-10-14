@@ -19,7 +19,7 @@ public class NoticeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NoticeDTO> get(@PathVariable Long id) {
+    public ResponseEntity<NoticeDTO> get(@PathVariable("id") Long id) {
         return ResponseEntity.ok(noticeService.getNoticeById(id));
     }
 
@@ -29,7 +29,7 @@ public class NoticeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<NoticeDTO> update(@PathVariable Long id, @RequestBody NoticeDTO dto) {
+    public ResponseEntity<NoticeDTO> update(@PathVariable("id") Long id, @RequestBody NoticeDTO dto) {
         return ResponseEntity.ok(noticeService.updateNotice(id, dto));
     }
 

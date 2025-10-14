@@ -54,4 +54,11 @@ public class JwtTokenProvider {
             return false;
         }
     }
+    
+    public String getUserIdFromToken(String token) {
+        return JWT.require(getAlgorithm())
+                .build()
+                .verify(token)
+                .getSubject(); 
+    }
 }

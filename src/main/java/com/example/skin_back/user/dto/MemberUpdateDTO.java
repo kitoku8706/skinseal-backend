@@ -16,7 +16,4 @@ public class MemberUpdateDTO {
     public boolean isPasswordChangeRequest() {
         return newPassword != null && !newPassword.isEmpty();
     }
-    
-    
-    
 }

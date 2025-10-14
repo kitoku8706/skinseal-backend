@@ -32,19 +32,25 @@ public class UserEntity {
     @SequenceGenerator(name = "ss_user_seq", sequenceName = "ss_user_seq", allocationSize = 1)
     private Long userId;
 
+    @Column(name = "login_id", unique = true, nullable = false) 
+    private String loginId;
+    
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private UserRole role; // 또는 @Enumerated(EnumType.STRING)으로 enum 타입 사용
-
+    @Column(name = "birth")
+    private String birth; 
+    
     @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "phone_number")
     private String phoneNumber;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRole role;
 }

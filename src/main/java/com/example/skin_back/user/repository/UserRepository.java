@@ -10,6 +10,6 @@ import com.example.skin_back.user.entity.UserEntity;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long>{
-	Optional<UserEntity> findByUsername(String username);
-	boolean existsByUsername(String username);
+	Optional<UserEntity> findByLoginId(String username);
+	boolean existsByLoginId(String username);
 }

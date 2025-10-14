@@ -11,24 +11,26 @@ import lombok.ToString;
 @Getter
 public class AuthInfo {
 	private Long userId;
+	private String loginId; 
 	private String username;
 	private String password;
-	private UserRole role;
 	private String email;
 	private String phoneNumber;
+	private UserRole role;
 	
 	public AuthInfo() {
 		
 	}
-
-	public AuthInfo(Long userId, String username, String password, UserRole role, String email, String phoneNumber) {
+    
+	public AuthInfo(Long userId, String loginId, String username, String password, String email, String phoneNumber, UserRole role) {
 		super();
 		this.userId = userId;
+		this.loginId = loginId; 
 		this.username = username;
 		this.password = password;
-		this.role = role;
 		this.email = email;
 		this.phoneNumber = phoneNumber;
+		this.role = role;
 	}
 		
 }

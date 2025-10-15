@@ -129,6 +129,19 @@ public class UserServiceImpl implements UserService {
 		return userRepository.existsByLoginId(loginId);
 	}
 
+	@Override
+	public void deleteMember(String loginId, String password) {
+		UserEntity userEntity = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("탈퇴할 사용자를 찾을 수 없습니다."));
+
+        if (!passwordEncoder.matches(password, userEntity.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. 사용자 삭제
+        userRepository.delete(userEntity);
+    }
+	
 	public UserServiceImpl() {
 
 	}

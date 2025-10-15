@@ -1,3 +1,4 @@
+// src/main/java/com/example/skin_back/management/repository/ManagementRepository.java
 package com.example.skin_back.management.repository;
 
 import com.example.skin_back.management.entity.ManagementEntity;

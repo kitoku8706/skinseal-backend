@@ -15,4 +15,5 @@ public interface UserService {
 	public MemberInfoDTO getUserInfo(String username);
 	public void updateMemberInfo(String username, MemberUpdateDTO dto);
 	public boolean checkLoginIdDuplicate(String loginId);
+	public void deleteMember(String loginId, String password);
 }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -112,6 +113,21 @@ public class UserController {
         boolean isDuplicate = userService.checkLoginIdDuplicate(loginId);
         
         return ResponseEntity.ok(new IdCheckResponse(isDuplicate));
+    }
+    
+    @DeleteMapping("/delete") 
+    public ResponseEntity<String> deleteMember(@RequestBody UserDTO deleteDto) { 
+        try {
+            String loginId = getAuthenticatedLoginId();
+            
+            userService.deleteMember(loginId, deleteDto.getPassword()); 
+            
+            return ResponseEntity.ok("회원 탈퇴가 성공적으로 완료되었습니다.");
+        } catch (RuntimeException e) {
+            log.error("회원 탈퇴 실패: {}", e.getMessage());
+            // 비밀번호 불일치 등 예외 처리
+            return ResponseEntity.badRequest().body("회원 탈퇴 실패: " + e.getMessage());
+        }
     }
 	
 }

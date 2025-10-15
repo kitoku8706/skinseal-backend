@@ -10,14 +10,17 @@ import lombok.Setter;
 @Builder
 public class MemberInfoDTO {
 
+    private String loginId; 
     private String username;
+    private String birth;
     private String phoneNumber;
     private String email;
 
-    // UserEntity를 MemberInfoDto로 변환하는 정적 메서드
     public static MemberInfoDTO fromEntity(UserEntity userEntity) {
         return MemberInfoDTO.builder()
+                .loginId(userEntity.getLoginId()) 
                 .username(userEntity.getUsername())
+                .birth(userEntity.getBirth()) 
                 .phoneNumber(userEntity.getPhoneNumber())
                 .email(userEntity.getEmail())
                 .build();

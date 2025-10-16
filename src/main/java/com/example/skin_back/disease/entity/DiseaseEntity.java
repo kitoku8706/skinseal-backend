@@ -31,4 +31,7 @@ public class DiseaseEntity {
 
     @Column(name = "causes")
     private String causes;
+    
+    @Column(name = "image_url", columnDefinition = "TEXT")
+    private String imageUrl;
 }

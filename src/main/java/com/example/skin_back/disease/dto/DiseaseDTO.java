@@ -17,4 +17,5 @@ public class DiseaseDTO {
     private String description;
     private String symptoms;
     private String causes;
+    private String imageUrl;
 }

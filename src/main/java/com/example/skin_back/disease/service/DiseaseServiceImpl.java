@@ -4,6 +4,7 @@ import com.example.skin_back.disease.dto.DiseaseDTO;
 import com.example.skin_back.disease.entity.DiseaseEntity;
 import com.example.skin_back.disease.repository.DiseaseRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ public class DiseaseServiceImpl implements DiseaseService {
                 .description(diseaseDTO.getDescription())
                 .symptoms(diseaseDTO.getSymptoms())
                 .causes(diseaseDTO.getCauses())
+                .imageUrl(diseaseDTO.getImageUrl())
                 .build();
         DiseaseEntity saved = diseaseRepository.save(entity);
         return toDTO(saved);
@@ -34,7 +36,10 @@ public class DiseaseServiceImpl implements DiseaseService {
 
     @Override
     public List<DiseaseDTO> getAllDiseases() {
-        return diseaseRepository.findAll().stream()
+        Sort sort = Sort.by(Sort.Direction.ASC, "diseaseId");
+        List<DiseaseEntity> entities = diseaseRepository.findAll(sort); 
+        
+        return entities.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
@@ -47,6 +52,7 @@ public class DiseaseServiceImpl implements DiseaseService {
                     entity.setDescription(diseaseDTO.getDescription());
                     entity.setSymptoms(diseaseDTO.getSymptoms());
                     entity.setCauses(diseaseDTO.getCauses());
+                    entity.setImageUrl(diseaseDTO.getImageUrl());
                     return toDTO(diseaseRepository.save(entity));
                 })
                 .orElse(null);
@@ -64,6 +70,7 @@ public class DiseaseServiceImpl implements DiseaseService {
                 .description(entity.getDescription())
                 .symptoms(entity.getSymptoms())
                 .causes(entity.getCauses())
+                .imageUrl(entity.getImageUrl())
                 .build();
     }
 }

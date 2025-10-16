@@ -35,7 +35,7 @@ public class UserEntity {
     @Column(name = "login_id", unique = true, nullable = false) 
     private String loginId;
     
-    @Column(name = "username", unique = true, nullable = false)
+    @Column(name = "username", nullable = false)
     private String username;
 
     @Column(name = "password", nullable = false)

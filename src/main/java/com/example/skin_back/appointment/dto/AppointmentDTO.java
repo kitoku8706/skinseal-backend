@@ -1,11 +1,15 @@
 package com.example.skin_back.appointment.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import java.time.LocalDate;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -14,8 +18,19 @@ import java.time.LocalDate;
 @Builder
 public class AppointmentDTO {
     private Long appointmentId;
+    
+    @JsonProperty("user_id")
     private Long userId;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonProperty("appointment_date")
     private LocalDate appointmentDate;
+    
+    @JsonProperty("appointment_time")
     private String appointmentTime;
+    
     private String purpose;
+    
+    @JsonProperty("consultant_id")
+    private Long consultantId;
 }

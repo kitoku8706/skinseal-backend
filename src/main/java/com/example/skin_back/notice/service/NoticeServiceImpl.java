@@ -4,6 +4,8 @@ import com.example.skin_back.notice.dto.NoticeDTO;
 import com.example.skin_back.notice.entity.NoticeEntity;
 import com.example.skin_back.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,6 +62,19 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public void deleteNotice(Long noticeId) {
         noticeRepository.deleteById(noticeId);
+    }
+
+    @Override
+    public boolean existsById(Long noticeId) {
+        return noticeRepository.existsById(noticeId);
+    }
+
+    // New: search with pagination
+    @Override
+    public Page<NoticeDTO> searchNotices(String keyword, String type, Pageable pageable) {
+        // Use custom repository search implementation
+        Page<NoticeEntity> page = noticeRepository.search((keyword == null || keyword.isBlank()) ? null : keyword, (type == null || type.isBlank()) ? null : type, pageable);
+        return page.map(this::toDTO);
     }
 
     private NoticeDTO toDTO(NoticeEntity entity) {

@@ -32,10 +32,10 @@ public class UserEntity {
     @SequenceGenerator(name = "ss_user_seq", sequenceName = "ss_user_seq", allocationSize = 1)
     private Long userId;
 
-    @Column(name = "login_id", unique = true, nullable = false) 
+    @Column(name = "login_id", unique = true, nullable = true) 
     private String loginId;
     
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = true)
     private String username;
 
     @Column(name = "password", nullable = false)
@@ -44,7 +44,7 @@ public class UserEntity {
     @Column(name = "birth")
     private String birth; 
     
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     @Column(name = "phone_number")

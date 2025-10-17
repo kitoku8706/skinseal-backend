@@ -35,10 +35,11 @@ public class NoticeEntity {
     @Column(name = "author_id", nullable = true)
     private Long authorId;
     
-    @Column(name = "type", nullable = false)
+    @Column(name = "type", nullable = true)
     private String type;
 
     @Column(name = "views", nullable = false)
+    @Builder.Default
     private int views = 0;
 
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -12,4 +12,6 @@ import com.example.skin_back.user.entity.UserEntity;
 public interface UserRepository extends JpaRepository<UserEntity, Long>{
 	Optional<UserEntity> findByLoginId(String username);
 	boolean existsByLoginId(String username);
+	Optional<UserEntity> findByEmail(String email);
+	boolean existsByEmail(String email);
 }

@@ -19,8 +19,13 @@ public class DiseaseController {
         return ResponseEntity.ok(diseaseService.createDisease(dto));
     }
 
-    @GetMapping("/list")
+    @GetMapping
     public ResponseEntity<List<DiseaseDTO>> getAll() {
+        return ResponseEntity.ok(diseaseService.getAllDiseases());
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<DiseaseDTO>> getAllList() {
         return ResponseEntity.ok(diseaseService.getAllDiseases());
     }
 

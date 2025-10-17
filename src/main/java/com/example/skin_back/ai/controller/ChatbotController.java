@@ -3,6 +3,7 @@ package com.example.skin_back.ai.controller;
 import com.example.skin_back.ai.entity.ChatbotCategory;
 import com.example.skin_back.ai.service.ChatbotService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,9 +30,10 @@ public class ChatbotController {
     }
 
     @GetMapping("/answer/{categoryId}")
-    public ChatbotCategory getAnswer(@PathVariable Long categoryId) {
+    public ResponseEntity<Object> getAnswer(@PathVariable Long categoryId) {
         return service.getCategoryAnswer(categoryId)
-            .orElseThrow(() -> new RuntimeException("카테고리 없음"));
+            .map(category -> ResponseEntity.ok().body((Object) category))
+            .orElseGet(() -> ResponseEntity.ok().body(Map.of("message", "카테고리 없음")));
     }
 
     @GetMapping("/fallback")

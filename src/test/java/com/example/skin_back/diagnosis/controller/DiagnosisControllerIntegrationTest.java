@@ -2,6 +2,7 @@ package com.example.skin_back.diagnosis.controller;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,7 @@ class DiagnosisControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
+    @Disabled("AI 서버가 실행 중일 때만 테스트 - 통합 테스트 환경에서만 활성화")
     @DisplayName("AI 서버 연동 진단 통합 테스트")
     void diagnoseIntegrationTest() throws Exception {
         // 테스트용 임시 이미지 생성 (1x1 픽셀 jpg)

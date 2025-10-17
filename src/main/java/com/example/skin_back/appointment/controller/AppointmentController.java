@@ -5,11 +5,13 @@ import com.example.skin_back.appointment.service.AppointmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 
-
-@RequestMapping("/api/appointment")
 @RestController
+@RequestMapping("/api/appointment")  // 프록시 경로와 일치시킴
 @RequiredArgsConstructor
 public class AppointmentController {
     
@@ -39,5 +41,14 @@ public class AppointmentController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         appointmentService.deleteAppointment(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "입력값 오류");
+        errorResponse.put("message", ex.getMessage());
+
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 }

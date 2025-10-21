@@ -35,11 +35,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public AuthInfo addMemberProcess(UserDTO dto) {
 
-		// loginId가 없으면 email을 loginId로 사용
-		if (dto.getLoginId() == null || dto.getLoginId().isEmpty()) {
-			dto.setLoginId(dto.getEmail());
-		}
-
 		if (userRepository.existsByLoginId(dto.getLoginId())) {
 			// 중복 아이디 처리 로직 추가 예정
 			throw new RuntimeException("이미 존재하는 사용자 이름입니다.");

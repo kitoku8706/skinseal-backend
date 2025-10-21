@@ -67,15 +67,16 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public boolean existsById(Long noticeId) {
         return noticeRepository.existsById(noticeId);
-    }    // New: search with pagination
+    }
+
+    // New: search with pagination
     @Override
     public Page<NoticeDTO> searchNotices(String keyword, String type, Pageable pageable) {
-        // JPA 쿼리 메서드 사용
-        Page<NoticeEntity> page = noticeRepository.searchNotices(
-            (keyword == null || keyword.isBlank()) ? null : keyword, 
-            (type == null || type.isBlank()) ? null : type, 
-            pageable
-        );
+        // 커스텀 네이티브 쿼리 사용 (CAST + ILIKE), JPQL의 LOWER 문제 회피
+        Page<com.example.skin_back.notice.entity.NoticeEntity> page = ((com.example.skin_back.notice.repository.NoticeRepositoryCustom) noticeRepository)
+            .search((keyword == null || keyword.isBlank()) ? null : keyword,
+                    (type == null || type.isBlank()) ? null : type,
+                    pageable);
         return page.map(this::toDTO);
     }
 

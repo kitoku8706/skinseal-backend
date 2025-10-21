@@ -2,6 +2,8 @@ package com.example.skin_back.diagnosis.service;
 
 import com.example.skin_back.diagnosis.entity.DiagnosisHistory;
 import com.example.skin_back.diagnosis.repository.DiagnosisHistoryRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -60,10 +62,14 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<String> response = restTemplate.postForEntity(pythonServerUrl, requestEntity, String.class);
-            String aiResult = response.getBody();
+            String aiResultRaw = response.getBody();
+
+            // JSON 파싱
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> aiResult = objectMapper.readValue(aiResultRaw, new TypeReference<Map<String, Object>>() {});
 
             // 3. DB 저장
-            DiagnosisHistory history = new DiagnosisHistory(dest.getAbsolutePath(), aiResult, LocalDateTime.now());
+            DiagnosisHistory history = new DiagnosisHistory(dest.getAbsolutePath(), aiResultRaw, LocalDateTime.now());
             diagnosisHistoryRepository.save(history);
 
             // 4. 결과 반환

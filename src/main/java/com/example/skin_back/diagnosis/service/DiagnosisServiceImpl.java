@@ -2,6 +2,8 @@ package com.example.skin_back.diagnosis.service;
 
 import com.example.skin_back.diagnosis.entity.DiagnosisHistory;
 import com.example.skin_back.diagnosis.repository.DiagnosisHistoryRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -17,8 +19,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class DiagnosisServiceImpl implements DiagnosisService {
+    private static final Logger log = LoggerFactory.getLogger(DiagnosisServiceImpl.class);
     private final DiagnosisHistoryRepository diagnosisHistoryRepository;
 
     @Value("${diagnosis.upload-dir:uploads}")
@@ -31,6 +39,11 @@ public class DiagnosisServiceImpl implements DiagnosisService {
         this.diagnosisHistoryRepository = diagnosisHistoryRepository;
     }
 
+    @PostConstruct
+    void logConfigOnStart() {
+        log.info("DiagnosisService config: uploadDir={}, pythonServerUrl={}", uploadDir, pythonServerUrl);
+    }
+
     @Override
     public Map<String, Object> diagnose(MultipartFile imageFile) throws IOException {
         // 1. 이미지 저장
@@ -40,26 +53,33 @@ public class DiagnosisServiceImpl implements DiagnosisService {
         File dest = new File(dir, fileName);
         imageFile.transferTo(dest);
 
-        // 2. Python AI 서버로 이미지 전송
-        RestTemplate restTemplate = new RestTemplate();
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("image", new org.springframework.core.io.FileSystemResource(dest));
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-        ResponseEntity<String> response = restTemplate.postForEntity(pythonServerUrl, requestEntity, String.class);
-        String aiResult = response.getBody();
+        try {
+            // 2. Python AI 서버로 이미지 전송
+            RestTemplate restTemplate = new RestTemplate();
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("image", new org.springframework.core.io.FileSystemResource(dest));
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(pythonServerUrl, requestEntity, String.class);
+            String aiResultRaw = response.getBody();
 
-        // 3. DB 저장
-        DiagnosisHistory history = new DiagnosisHistory(dest.getAbsolutePath(), aiResult, LocalDateTime.now());
-        diagnosisHistoryRepository.save(history);
+            // JSON 파싱
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> aiResult = objectMapper.readValue(aiResultRaw, new TypeReference<Map<String, Object>>() {});
 
-        // 4. 결과 반환 (JSON 파싱)
-        // 실제로는 aiResult를 JSON으로 파싱해서 반환해야 함
-        // 예시: {"diagnosis":"정상","confidence":0.95}
-        Map<String, Object> result = new HashMap<>();
-        result.put("aiResult", aiResult); // 원본 결과
-        result.put("historyId", history.getId());
-        return result;
+            // 3. DB 저장
+            DiagnosisHistory history = new DiagnosisHistory(dest.getAbsolutePath(), aiResultRaw, LocalDateTime.now());
+            diagnosisHistoryRepository.save(history);
+
+            // 4. 결과 반환
+            Map<String, Object> result = new HashMap<>();
+            result.put("aiResult", aiResult);
+            result.put("historyId", history.getId());
+            return result;
+        } catch (Exception e) {
+            log.error("Failed to call Python AI server. url={}, error={}", pythonServerUrl, e.toString());
+            throw e;
+        }
     }
 }

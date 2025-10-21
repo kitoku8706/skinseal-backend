@@ -29,11 +29,18 @@ public class NoticeController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(notice);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<NoticeDTO>> getAll() {
-        return ResponseEntity.ok(noticeService.getAllNotices());
+    }    @GetMapping
+    public ResponseEntity<?> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String type) {
+        
+        // Native Query 사용 시 정렬은 SQL에서 처리됨 (ORDER BY created_at DESC)
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<NoticeDTO> result = noticeService.searchNotices(keyword, type, pageable);
+        
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("/{id}")

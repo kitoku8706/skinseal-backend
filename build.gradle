@@ -13,6 +13,11 @@ java {
 	}
 }
 
+// 파라미터 이름 보존 옵션 추가 (Spring @RequestParam 등에서 필요)
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += ['-parameters']
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor

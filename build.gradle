@@ -9,8 +9,13 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
+}
+
+// 파라미터 이름 보존 옵션 추가 (Spring @RequestParam 등에서 필요)
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += ['-parameters']
 }
 
 configurations {

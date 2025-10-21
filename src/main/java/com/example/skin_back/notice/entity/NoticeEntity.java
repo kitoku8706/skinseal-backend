@@ -36,13 +36,11 @@ public class NoticeEntity {
     private Long authorId;
     
     @Column(name = "type", nullable = true)
-    private String type;
-
-    @Column(name = "views", nullable = false)
+    private String type;    @Column(name = "views", nullable = false)
     @Builder.Default
     private int views = 0;
 
-    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private java.util.List<com.example.skin_back.common.entity.FileAttachmentEntity> attachments;
     
 

@@ -12,4 +12,6 @@ public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Long> 
     List<ScheduleEntity> findByConsultantId(Integer consultantId);
 
     List<ScheduleEntity> findByDate(String date);
+
+    List<ScheduleEntity> findByWeekDay(Integer weekDay);
 }

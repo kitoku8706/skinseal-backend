@@ -9,6 +9,9 @@ import com.example.skin_back.schedule.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,15 +51,13 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public List<ScheduleDTO> getSchedulesByDate(String date) {
-        List<Schedule> schedules = scheduleRepository.findByDate(date);
+        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+        DayOfWeek dayOfWeek = localDate.getDayOfWeek();
+        int weekDayValue = dayOfWeek.getValue(); // 월요일(1) ~ 일요일(7)
+
+        List<ScheduleEntity> schedules = scheduleRepository.findByWeekDay(weekDayValue);
         return schedules.stream()
-                .map(schedule -> new ScheduleDTO(
-                        schedule.getId(),
-                        schedule.getConsultantId(),
-                        schedule.getDate(),
-                        schedule.getTime(),
-                        schedule.isAvailable()
-                ))
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 

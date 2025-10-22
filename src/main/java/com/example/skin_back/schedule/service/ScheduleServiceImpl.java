@@ -57,7 +57,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         List<ScheduleEntity> schedules = scheduleRepository.findByWeekDay(weekDayValue);
         return schedules.stream()
-                .map(this::toDTO)
+                .map(this::toDTO) // toDTO 메서드를 사용하여 변환
                 .collect(Collectors.toList());
     }
 

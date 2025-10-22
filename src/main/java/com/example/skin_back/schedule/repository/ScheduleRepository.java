@@ -10,4 +10,6 @@ import java.util.List;
 public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Long> {
     // 특정 상담사 일정 조회 (주별, 필요시 추가 파라미터로 확장 가능)
     List<ScheduleEntity> findByConsultantId(Integer consultantId);
+
+    List<ScheduleEntity> findByDate(String date);
 }

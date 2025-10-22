@@ -39,6 +39,12 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleService.getAllSchedules());
     }
 
+    @GetMapping("/date/{date}")
+    public ResponseEntity<List<ScheduleDTO>> getSchedulesByDate(@PathVariable String date) {
+        List<ScheduleDTO> schedules = scheduleService.getSchedulesByDate(date);
+        return ResponseEntity.ok(schedules);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ScheduleDTO> updateSchedule(@PathVariable Long id, @RequestBody ScheduleDTO dto) {
         ScheduleDTO updated = scheduleService.updateSchedule(id, dto);

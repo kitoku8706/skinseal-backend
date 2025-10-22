@@ -47,6 +47,20 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
+    public List<ScheduleDTO> getSchedulesByDate(String date) {
+        List<Schedule> schedules = scheduleRepository.findByDate(date);
+        return schedules.stream()
+                .map(schedule -> new ScheduleDTO(
+                        schedule.getId(),
+                        schedule.getConsultantId(),
+                        schedule.getDate(),
+                        schedule.getTime(),
+                        schedule.isAvailable()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public ScheduleDTO updateSchedule(Long scheduleId, ScheduleDTO scheduleDTO) {
         return scheduleRepository.findById(scheduleId)
                 .map(entity -> {

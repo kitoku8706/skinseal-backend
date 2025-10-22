@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notice")
@@ -32,8 +33,21 @@ public class NoticeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<NoticeDTO>> getAll() {
-        return ResponseEntity.ok(noticeService.getAllNotices());
+    public ResponseEntity<?> getAll(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "type", required = false) String type) {
+        try {
+            PageRequest pageable = PageRequest.of(page, size);
+            Page<NoticeDTO> result = noticeService.searchNotices(keyword, type, pageable);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "공지 조회 실패",
+                "message", e.getMessage()
+            ));
+        }
     }
 
     @PutMapping("/{id}")

@@ -72,8 +72,11 @@ public class NoticeServiceImpl implements NoticeService {
     // New: search with pagination
     @Override
     public Page<NoticeDTO> searchNotices(String keyword, String type, Pageable pageable) {
-        // Use custom repository search implementation
-        Page<NoticeEntity> page = noticeRepository.search((keyword == null || keyword.isBlank()) ? null : keyword, (type == null || type.isBlank()) ? null : type, pageable);
+        // 커스텀 네이티브 쿼리 사용 (CAST + ILIKE), JPQL의 LOWER 문제 회피
+        Page<com.example.skin_back.notice.entity.NoticeEntity> page = ((com.example.skin_back.notice.repository.NoticeRepositoryCustom) noticeRepository)
+            .search((keyword == null || keyword.isBlank()) ? null : keyword,
+                    (type == null || type.isBlank()) ? null : type,
+                    pageable);
         return page.map(this::toDTO);
     }
 

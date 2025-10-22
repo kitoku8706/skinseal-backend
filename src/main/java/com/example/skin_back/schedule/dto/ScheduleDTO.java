@@ -1,18 +1,24 @@
 package com.example.skin_back.schedule.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ScheduleDTO {
-
-    private Long scheduleId;
-    private Integer consultantId;
-    private Integer weekDay;
-    private String timeSlot;
-    private Boolean isAvailable;
-    private String note;
+    private Long id;
+    private Boolean available;
+    private String counselor_name;
+    private String date;
+    private String time;
+    private Long counselorId;
+    
+    // 직접 getter 추가
+    public Long getCounselorId() {
+        return this.counselorId;
+    }
 }

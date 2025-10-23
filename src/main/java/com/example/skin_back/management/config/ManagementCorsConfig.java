@@ -20,6 +20,6 @@ public class ManagementCorsConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:///C:/Users/강의1_03/Desktop/2차프로젝트 PPT/skinseal-backend/uploads/");
+                .addResourceLocations("file:///C:/Users/강의1_03/Desktop/project2/skinseal-backend/uploads/");
     }
 }

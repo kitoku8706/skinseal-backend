@@ -68,7 +68,7 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> aiResult = objectMapper.readValue(aiResultRaw, new TypeReference<Map<String, Object>>() {});
 
-            // 3. DB 저장
+            // 3. DB 저장(이미지 업로드 플로우)
             DiagnosisHistory history = new DiagnosisHistory(dest.getAbsolutePath(), aiResultRaw, LocalDateTime.now());
             diagnosisHistoryRepository.save(history);
 
@@ -81,5 +81,30 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             log.error("Failed to call Python AI server. url={}, error={}", pythonServerUrl, e.toString());
             throw e;
         }
+    }
+
+    @Override
+    public Map<String, Object> saveAiResult(Map<String, Object> payload) throws IOException {
+        // payload: { userId, modelName, result: [ {class, probability}, ... ] }
+        ObjectMapper om = new ObjectMapper();
+        String rawJson = om.writeValueAsString(payload);
+
+        Long userId = null;
+        String modelName = null;
+        try {
+            Object uid = payload.get("userId");
+            if (uid != null) userId = Long.valueOf(uid.toString());
+        } catch (Exception ignore) {}
+        Object mn = payload.get("modelName");
+        if (mn != null) modelName = mn.toString();
+
+        DiagnosisHistory history = new DiagnosisHistory(userId, modelName, rawJson, LocalDateTime.now());
+        diagnosisHistoryRepository.save(history);
+
+        Map<String, Object> ret = new HashMap<>();
+        ret.put("historyId", history.getId());
+        ret.put("userId", userId);
+        ret.put("modelName", modelName);
+        return ret;
     }
 }

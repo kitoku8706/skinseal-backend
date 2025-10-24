@@ -128,6 +128,14 @@ public class UserController {
             // 비밀번호 불일치 등 예외 처리
             return ResponseEntity.badRequest().body("회원 탈퇴 실패: " + e.getMessage());
         }
+        
     }
-	
+    
+    @GetMapping("/api/user/me")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails user)) {
+            return ResponseEntity.status(401).body("로그인 후 이용해주세요.");
+        }
+        return ResponseEntity.ok(user.getUserEntity());
+    }
 }

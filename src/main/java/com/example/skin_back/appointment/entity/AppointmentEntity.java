@@ -34,6 +34,12 @@ public class AppointmentEntity {
 
     @Column(name = "purpose", length = 255)
     private String purpose;
+    
+    @Column(name = "birth")
+    private LocalDate birth;
+
+    @Column(name = "phone", length = 20)
+    private String phone; // ✅ 추가
 
     @Column(name = "status", length = 20)
     private String status;

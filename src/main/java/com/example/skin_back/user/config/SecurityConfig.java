@@ -17,6 +17,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.example.skin_back.user.config.jwt.JwtAccessDeniedHandler;
+import com.example.skin_back.user.config.jwt.JwtAuthenticationEntryPoint;
 import com.example.skin_back.user.config.jwt.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 	
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint; // 👈 추가
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 	
 	@Bean
 	PasswordEncoder passwordEncoder() {
@@ -63,6 +67,11 @@ public class SecurityConfig {
             // 4. 세션 비활성화 (JWT는 무상태(Stateless)를 지향)
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            .exceptionHandling(handling -> handling
+                    .authenticationEntryPoint(jwtAuthenticationEntryPoint) // 인증 실패 처리 (401)
+                    .accessDeniedHandler(jwtAccessDeniedHandler)           // 인가 실패 처리 (403)
+                )
             
             // 5. 요청별 인가(Authorization) 설정
             .authorizeHttpRequests(authorize -> authorize

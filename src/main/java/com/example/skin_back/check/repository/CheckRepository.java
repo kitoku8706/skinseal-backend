@@ -7,5 +7,7 @@ import java.util.Optional;
 
 @Repository
 public interface CheckRepository extends JpaRepository<CheckEntity, Long> {
-    Optional<CheckEntity> findTopByUserIdOrderByAppointmentDateDesc(Long userId);
+
+    // ✅ 최신 예약 중 "취소되지 않은" 예약만 조회
+    Optional<CheckEntity> findTopByUserIdAndStatusNotOrderByAppointmentDateDesc(Long userId, String status);
 }

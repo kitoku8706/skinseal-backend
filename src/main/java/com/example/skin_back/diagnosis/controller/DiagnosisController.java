@@ -43,6 +43,20 @@ public class DiagnosisController {
         }
     }
 
+    // Python AI 서버가 직접 저장을 위해 호출하는 엔드포인트
+    @PostMapping
+    public ResponseEntity<?> saveDiagnosisFromAi(@RequestBody Map<String, Object> payload) {
+        try {
+            Map<String, Object> saved = diagnosisService.saveAiResult(payload);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of(
+                "error", "유효하지 않은 요청",
+                "message", e.getMessage()
+            ));
+        }
+    }
+
     @GetMapping("/config")
     public Map<String, Object> config() {
         Map<String, Object> m = new HashMap<>();
@@ -64,6 +78,16 @@ public class DiagnosisController {
             return ResponseEntity.ok(m);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", e.toString(), "url", pythonServerUrl));
+        }
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<?> getHistory(@RequestParam("userId") Long userId) {
+        try {
+            var list = diagnosisService.getHistoryForUser(userId);
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "history fetch failed", "message", e.getMessage()));
         }
     }
 }

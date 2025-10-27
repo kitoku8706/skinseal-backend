@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,5 +108,29 @@ public class DiagnosisServiceImpl implements DiagnosisService {
         ret.put("userId", userId);
         ret.put("modelName", modelName);
         return ret;
+    }
+
+    @Override
+    public List<Map<String, Object>> getHistoryForUser(Long userId) throws Exception {
+        // 조회: userId로 저장된 이력을 가져와 JSON 문자열을 파싱하여 Map 리스트로 반환
+        List<DiagnosisHistory> items = diagnosisHistoryRepository.findAll().stream()
+                .filter(h -> h.getUserId() != null && h.getUserId().equals(userId))
+                .collect(Collectors.toList());
+        ObjectMapper om = new ObjectMapper();
+        List<Map<String, Object>> out = items.stream().map(h -> {
+            try {
+                Map<String, Object> m = om.readValue(h.getResult(), new TypeReference<Map<String, Object>>() {});
+                m.put("historyId", h.getId());
+                m.put("createdAt", h.getCreatedAt().toString());
+                return m;
+            } catch (Exception e) {
+                Map<String, Object> fallback = new HashMap<>();
+                fallback.put("historyId", h.getId());
+                fallback.put("raw", h.getResult());
+                fallback.put("createdAt", h.getCreatedAt().toString());
+                return fallback;
+            }
+        }).collect(Collectors.toList());
+        return out;
     }
 }

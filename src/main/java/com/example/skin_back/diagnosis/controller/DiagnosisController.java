@@ -80,4 +80,14 @@ public class DiagnosisController {
             return ResponseEntity.status(500).body(Map.of("error", e.toString(), "url", pythonServerUrl));
         }
     }
+
+    @GetMapping("/history")
+    public ResponseEntity<?> getHistory(@RequestParam("userId") Long userId) {
+        try {
+            var list = diagnosisService.getHistoryForUser(userId);
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "history fetch failed", "message", e.getMessage()));
+        }
+    }
 }

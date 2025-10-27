@@ -24,9 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider; 
+    private final JwtTokenProvider jwtTokenProvider;
     
-    private final CustomUserDetailsService customUserDetailsService; 
+    private final CustomUserDetailsService customUserDetailsService;
 
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
@@ -44,27 +44,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = resolveToken(request);
 
-            if (jwt != null && jwtTokenProvider.validateToken(jwt)) {
+            if (jwt != null) {
+                // 토큰 유효성 검사
+                if (jwtTokenProvider.validateToken(jwt)) {
 
-                String userIdStr = jwtTokenProvider.getUserIdFromToken(jwt); 
-                Long userId = Long.parseLong(userIdStr); 
+                    String userIdStr = jwtTokenProvider.getUserIdFromToken(jwt);
+                    Long userId = Long.parseLong(userIdStr);
 
-                UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+                    UserDetails userDetails = customUserDetailsService.loadUserById(userId);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
-                );
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                    );
 
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                
+                } else {
+                    // 토큰이 유효하지 않은 경우, 401 응답을 직접 작성하고 체인을 중단
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("text/plain;charset=UTF-8");
+                    response.getWriter().write("JWT Token is invalid or expired.");
+                    return; 
+                }
             }
+
         } catch (Exception ex) {
-            // 토큰 관련 예외 발생 시
-            logger.error("Could not set user authentication in security context", ex);
+            log.error("Authentication process failed: {}", ex.getMessage(), ex);
+
+            // 예외 발생 시에도 401 응답을 강제하고 체인을 중단
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("Authentication failed due to token error.");
+            return;
         }
 
-        // 다음 필터로 체인 연결
+        // 다음 필터로 체인 연결 (인증 성공했거나, 토큰이 없어서 건너뛴 경우)
         filterChain.doFilter(request, response);
     }
 }

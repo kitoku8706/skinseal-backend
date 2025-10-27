@@ -3,6 +3,7 @@ package com.example.skin_back.diagnosis.service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 
 public interface DiagnosisService {
     Map<String, Object> diagnose(MultipartFile imageFile) throws Exception;
@@ -11,4 +12,6 @@ public interface DiagnosisService {
 
     // 특정 사용자(userId)에 대한 진단 이력 조회
     List<Map<String, Object>> getHistoryForUser(Long userId) throws Exception;
+
+    Optional<Map<String, Object>> getLatestForUserAndModel(Long userId, String modelName);
 }

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -167,5 +168,32 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             log.error("Unexpected error in getHistoryForUser for userId={}: {}", userId, e.toString());
             return List.of();
         }
+    }
+
+    @Override
+    public Optional<Map<String, Object>> getLatestForUserAndModel(Long userId, String modelName) {
+        Optional<DiagnosisHistory> opt = diagnosisHistoryRepository.findTopByUserIdAndModelNameOrderByCreatedAtDesc(userId, modelName);
+        if (!opt.isPresent()) return Optional.empty();
+        DiagnosisHistory dh = opt.get();
+        Map<String, Object> out = new HashMap<>();
+        out.put("id", dh.getId());
+        out.put("userId", dh.getUserId());
+        out.put("modelName", dh.getModelName());
+        out.put("imagePath", dh.getImagePath());
+        out.put("createdAt", dh.getCreatedAt() != null ? dh.getCreatedAt().toString() : null);
+        // Try to parse result JSON into structure; if fails, include raw string
+        String raw = dh.getResult();
+        if (raw != null && !raw.isEmpty()) {
+            try {
+                ObjectMapper om = new ObjectMapper();
+                Object parsed = om.readValue(raw, Object.class);
+                out.put("result", parsed);
+            } catch (Exception e) {
+                out.put("result", raw);
+            }
+        } else {
+            out.put("result", null);
+        }
+        return Optional.of(out);
     }
 }

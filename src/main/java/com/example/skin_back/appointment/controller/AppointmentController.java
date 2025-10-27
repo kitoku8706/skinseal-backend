@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -30,11 +29,12 @@ public class AppointmentController {
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails user)) {
             return ResponseEntity.status(401).body("로그인 후 이용해주세요.");
         }
-
         try {
+            // ✅ 한 유저당 1개의 예약만 허용 (AppointmentServiceImpl에서 체크)
             appointmentService.saveAppointment(dto, user.getUserEntity().getUserId());
             return ResponseEntity.ok("예약이 완료되었습니다!");
         } catch (IllegalStateException e) {
+            // ✅ 중복 예약 또는 이미 예약된 유저의 경우
             return ResponseEntity.status(409).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("예약 처리 중 오류 발생: " + e.getMessage());
@@ -48,5 +48,4 @@ public class AppointmentController {
     public ResponseEntity<List<AppointmentEntity>> getAppointmentsByDate(@PathVariable("date") String date) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByDate(date));
     }
-
 }

@@ -7,19 +7,20 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * 📘 AppointmentRepository
- * - 상담 예약 데이터를 DB에서 조회 / 저장 / 중복검사하는 레포지토리 인터페이스
- * - JpaRepository를 상속받아 기본 CRUD 기능 자동 제공
- */
 @Repository
 public interface AppointmentRepository extends JpaRepository<AppointmentEntity, Long> {
 
+    // ✅ 상담사, 날짜, 시간 중복 예약 방지
     boolean existsByCounselorIdAndAppointmentDateAndAppointmentTime(
             Long counselorId, LocalDate date, String time
     );
 
-    boolean existsByUserId(Long userId); // ✅ 추가 (한 유저당 1개 예약만 가능)
+    // ✅ 같은 유저가 같은 날짜에 예약한 적이 있는지 (시간 상관없이)
+    boolean existsByUserIdAndAppointmentDate(Long userId, LocalDate date);
 
+    // ✅ 날짜별 예약 조회
     List<AppointmentEntity> findByAppointmentDate(LocalDate date);
+
+    // ✅ 예약 취소 (유저 ID 기준 삭제)
+    void deleteByUserId(Long userId);
 }

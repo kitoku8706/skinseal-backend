@@ -53,4 +53,8 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private UserRole role;
+    
+    public Long getId() {
+        return this.userId;
+    }
 }

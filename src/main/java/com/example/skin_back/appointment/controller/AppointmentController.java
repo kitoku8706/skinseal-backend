@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -19,7 +20,7 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     /**
-     * ✅ 예약 등록 (로그인 사용자만)
+     * ✅ 예약 등록
      */
     @PostMapping
     public ResponseEntity<?> createAppointment(
@@ -30,11 +31,9 @@ public class AppointmentController {
             return ResponseEntity.status(401).body("로그인 후 이용해주세요.");
         }
         try {
-            // ✅ 한 유저당 1개의 예약만 허용 (AppointmentServiceImpl에서 체크)
             appointmentService.saveAppointment(dto, user.getUserEntity().getUserId());
             return ResponseEntity.ok("예약이 완료되었습니다!");
         } catch (IllegalStateException e) {
-            // ✅ 중복 예약 또는 이미 예약된 유저의 경우
             return ResponseEntity.status(409).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("예약 처리 중 오류 발생: " + e.getMessage());
@@ -42,10 +41,25 @@ public class AppointmentController {
     }
 
     /**
-     * ✅ 날짜별 예약 목록 조회
+     * ✅ 날짜별 예약 조회
      */
     @GetMapping("/date/{date}")
     public ResponseEntity<List<AppointmentEntity>> getAppointmentsByDate(@PathVariable("date") String date) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByDate(date));
+    }
+
+    /**
+     * ✅ 예약 취소 (유저 ID 기준)
+     */
+    @DeleteMapping("/cancel/{userId}")
+    public ResponseEntity<String> cancelAppointment(@PathVariable Long userId) {
+        try {
+            appointmentService.cancelAppointment(userId);
+            return ResponseEntity.ok("예약이 성공적으로 취소되었습니다.");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("예약 취소 중 오류 발생: " + e.getMessage());
+        }
     }
 }

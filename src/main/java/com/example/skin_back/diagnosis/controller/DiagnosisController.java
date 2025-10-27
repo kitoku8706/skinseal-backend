@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 @RestController
 @RequestMapping("/api/diagnosis")
 public class DiagnosisController {
@@ -82,12 +83,96 @@ public class DiagnosisController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<?> getHistory(@RequestParam("userId") Long userId) {
+    public ResponseEntity<?> getHistory(@RequestParam(name = "userId", required = false) Long userId,
+                                        @RequestParam(name = "username", required = false) String username) {
         try {
-            var list = diagnosisService.getHistoryForUser(userId);
+            Long resolvedUserId = userId;
+
+            // If userId not provided but username is, try to resolve it
+            if (resolvedUserId == null && username != null && !username.isBlank()) {
+                // 1) if username is numeric, accept it
+                try {
+                    resolvedUserId = Long.valueOf(username);
+                } catch (Exception parseEx) {
+                    // 2) attempt to call member service to resolve username -> id
+                    try {
+                        RestTemplate rt = new RestTemplate();
+                        String memberUrl = "http://localhost:8090/api/member/user?username=" + username;
+                        ResponseEntity<Map> resp = rt.getForEntity(memberUrl, Map.class);
+                        if (resp.getStatusCode().is2xxSuccessful() && resp.getBody() != null) {
+                            Map body = resp.getBody();
+                            Object idObj = body.get("id");
+                            if (idObj == null) idObj = body.get("userId");
+                            if (idObj != null) {
+                                resolvedUserId = Long.valueOf(idObj.toString());
+                            }
+                        }
+                    } catch (Exception ex) {
+                        return ResponseEntity.status(400).body(Map.of(
+                                "error", "username resolution failed",
+                                "message", ex.getMessage(),
+                                "note", "No local member endpoint found or it returned unexpected shape. Provide numeric userId if possible."
+                        ));
+                    }
+                }
+            }
+
+            if (resolvedUserId == null) {
+                return ResponseEntity.status(400).body(Map.of("error", "userId or username query parameter is required"));
+            }
+
+            var list = diagnosisService.getHistoryForUser(resolvedUserId);
             return ResponseEntity.ok(list);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", "history fetch failed", "message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/latest")
+    public ResponseEntity<?> getLatest(@RequestParam(name = "userId", required = false) Long userId,
+                                       @RequestParam(name = "username", required = false) String username,
+                                       @RequestParam(name = "modelName", required = false) String modelName) {
+        try {
+            Long resolvedUserId = userId;
+
+            if (resolvedUserId == null && username != null && !username.isBlank()) {
+                try {
+                    resolvedUserId = Long.valueOf(username);
+                } catch (Exception parseEx) {
+                    try {
+                        RestTemplate rt = new RestTemplate();
+                        String memberUrl = "http://localhost:8090/api/member/user?username=" + username;
+                        ResponseEntity<Map> resp = rt.getForEntity(memberUrl, Map.class);
+                        if (resp.getStatusCode().is2xxSuccessful() && resp.getBody() != null) {
+                            Map body = resp.getBody();
+                            Object idObj = body.get("id");
+                            if (idObj == null) idObj = body.get("userId");
+                            if (idObj != null) {
+                                resolvedUserId = Long.valueOf(idObj.toString());
+                            }
+                        }
+                    } catch (Exception ex) {
+                        return ResponseEntity.status(400).body(Map.of(
+                                "error", "username resolution failed",
+                                "message", ex.getMessage(),
+                                "note", "Provide numeric userId if possible."
+                        ));
+                    }
+                }
+            }
+
+            if (resolvedUserId == null) {
+                return ResponseEntity.status(400).body(Map.of("error", "userId or username query parameter is required"));
+            }
+            if (modelName == null || modelName.isBlank()) {
+                return ResponseEntity.status(400).body(Map.of("error", "modelName query parameter is required"));
+            }
+
+            var opt = diagnosisService.getLatestForUserAndModel(resolvedUserId, modelName);
+            if (opt.isPresent()) return ResponseEntity.ok(opt.get());
+            return ResponseEntity.status(404).body(Map.of("error", "not_found", "message", "no record for given user/model"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "latest fetch failed", "message", e.getMessage()));
         }
     }
 }

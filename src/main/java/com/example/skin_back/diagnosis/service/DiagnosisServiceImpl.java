@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -112,25 +113,87 @@ public class DiagnosisServiceImpl implements DiagnosisService {
 
     @Override
     public List<Map<String, Object>> getHistoryForUser(Long userId) throws Exception {
-        // 조회: userId로 저장된 이력을 가져와 JSON 문자열을 파싱하여 Map 리스트로 반환
-        List<DiagnosisHistory> items = diagnosisHistoryRepository.findAll().stream()
-                .filter(h -> h.getUserId() != null && h.getUserId().equals(userId))
-                .collect(Collectors.toList());
-        ObjectMapper om = new ObjectMapper();
-        List<Map<String, Object>> out = items.stream().map(h -> {
+        log.info("Fetching latest diagnosis history for userId={}", userId);
+        try {
+            // Find records for the user, sort by createdAt desc and take the most recent one
+            List<DiagnosisHistory> items = diagnosisHistoryRepository.findAll().stream()
+                    .filter(h -> h.getUserId() != null && h.getUserId().equals(userId))
+                    .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                    .limit(1)
+                    .collect(Collectors.toList());
+
+            ObjectMapper om = new ObjectMapper();
+            List<Map<String, Object>> out = items.stream().map(h -> {
+                try {
+                    String raw = h.getResult();
+                    if (raw == null || raw.isBlank()) {
+                        Map<String, Object> empty = new HashMap<>();
+                        empty.put("historyId", h.getId());
+                        empty.put("createdAt", h.getCreatedAt().toString());
+                        empty.put("note", "empty result");
+                        return empty;
+                    }
+
+                    Object parsed = null;
+                    try {
+                        parsed = om.readValue(raw, Object.class);
+                    } catch (Exception pe) {
+                        log.warn("Failed to parse history.result JSON for id={}: {}", h.getId(), pe.toString());
+                    }
+
+                    Map<String, Object> m = new HashMap<>();
+                    if (parsed instanceof Map) {
+                        //noinspection unchecked
+                        m.putAll((Map<String, Object>) parsed);
+                    } else if (parsed instanceof List) {
+                        m.put("result", parsed);
+                    } else {
+                        m.put("raw", raw);
+                    }
+                    m.put("historyId", h.getId());
+                    m.put("createdAt", h.getCreatedAt().toString());
+                    return m;
+                } catch (Exception e) {
+                    log.error("Failed to convert DiagnosisHistory id={} to response map: {}", h.getId(), e.toString());
+                    Map<String, Object> fallback = new HashMap<>();
+                    fallback.put("historyId", h.getId());
+                    fallback.put("raw", h.getResult());
+                    fallback.put("createdAt", h.getCreatedAt().toString());
+                    fallback.put("error", e.toString());
+                    return fallback;
+                }
+            }).collect(Collectors.toList());
+            return out;
+        } catch (Exception e) {
+            log.error("Unexpected error in getHistoryForUser for userId={}: {}", userId, e.toString());
+            return List.of();
+        }
+    }
+
+    @Override
+    public Optional<Map<String, Object>> getLatestForUserAndModel(Long userId, String modelName) {
+        Optional<DiagnosisHistory> opt = diagnosisHistoryRepository.findTopByUserIdAndModelNameOrderByCreatedAtDesc(userId, modelName);
+        if (!opt.isPresent()) return Optional.empty();
+        DiagnosisHistory dh = opt.get();
+        Map<String, Object> out = new HashMap<>();
+        out.put("id", dh.getId());
+        out.put("userId", dh.getUserId());
+        out.put("modelName", dh.getModelName());
+        out.put("imagePath", dh.getImagePath());
+        out.put("createdAt", dh.getCreatedAt() != null ? dh.getCreatedAt().toString() : null);
+        // Try to parse result JSON into structure; if fails, include raw string
+        String raw = dh.getResult();
+        if (raw != null && !raw.isEmpty()) {
             try {
-                Map<String, Object> m = om.readValue(h.getResult(), new TypeReference<Map<String, Object>>() {});
-                m.put("historyId", h.getId());
-                m.put("createdAt", h.getCreatedAt().toString());
-                return m;
+                ObjectMapper om = new ObjectMapper();
+                Object parsed = om.readValue(raw, Object.class);
+                out.put("result", parsed);
             } catch (Exception e) {
-                Map<String, Object> fallback = new HashMap<>();
-                fallback.put("historyId", h.getId());
-                fallback.put("raw", h.getResult());
-                fallback.put("createdAt", h.getCreatedAt().toString());
-                return fallback;
+                out.put("result", raw);
             }
-        }).collect(Collectors.toList());
-        return out;
+        } else {
+            out.put("result", null);
+        }
+        return Optional.of(out);
     }
 }

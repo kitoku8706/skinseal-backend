@@ -40,8 +40,5 @@ public class NoticeEntity {
     @Builder.Default
     private int views = 0;
 
-    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private java.util.List<com.example.skin_back.common.entity.FileAttachmentEntity> attachments;
-    
 
 }

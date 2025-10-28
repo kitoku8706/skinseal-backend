@@ -16,9 +16,7 @@ public class DiagnosisHistory {
     private Long userId;
 
     // 새 필드: 사용된 모델명
-    private String modelName;
-
-    @Lob
+    private String modelName;    @Column(columnDefinition = "TEXT")
     private String result;
 
     private LocalDateTime createdAt;

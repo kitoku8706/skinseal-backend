@@ -3,37 +3,26 @@ package com.example.skin_back.diagnosis.service;
 import com.example.skin_back.diagnosis.entity.DiagnosisHistory;
 import com.example.skin_back.diagnosis.repository.DiagnosisHistoryRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.annotation.PostConstruct;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DiagnosisServiceImpl implements DiagnosisService {
     private static final Logger log = LoggerFactory.getLogger(DiagnosisServiceImpl.class);
     private final DiagnosisHistoryRepository diagnosisHistoryRepository;
-
-    @Value("${diagnosis.upload-dir:uploads}")
-    private String uploadDir;
 
     @Value("${diagnosis.python-server-url}")
     private String pythonServerUrl;
@@ -44,64 +33,37 @@ public class DiagnosisServiceImpl implements DiagnosisService {
 
     @PostConstruct
     void logConfigOnStart() {
-        log.info("DiagnosisService config: uploadDir={}, pythonServerUrl={}", uploadDir, pythonServerUrl);
+        log.info("DiagnosisService config: pythonServerUrl={}", pythonServerUrl);
     }
 
     @Override
     public Map<String, Object> diagnose(MultipartFile imageFile) throws IOException {
-        // 1. 이미지 저장
-        String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-        File dir = new File(uploadDir);
-        if (!dir.exists()) dir.mkdirs();
-        File dest = new File(dir, fileName);
-        imageFile.transferTo(dest);
-
-        try {
-            // 2. Python AI 서버로 이미지 전송
-            RestTemplate restTemplate = new RestTemplate();
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("image", new org.springframework.core.io.FileSystemResource(dest));
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(pythonServerUrl, requestEntity, String.class);
-            String aiResultRaw = response.getBody();
-
-            // JSON 파싱
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> aiResult = objectMapper.readValue(aiResultRaw, new TypeReference<Map<String, Object>>() {});
-
-            // 3. DB 저장(이미지 업로드 플로우)
-            DiagnosisHistory history = new DiagnosisHistory(dest.getAbsolutePath(), aiResultRaw, LocalDateTime.now());
-            diagnosisHistoryRepository.save(history);
-
-            // 4. 결과 반환
-            Map<String, Object> result = new HashMap<>();
-            result.put("aiResult", aiResult);
-            result.put("historyId", history.getId());
-            return result;
-        } catch (Exception e) {
-            log.error("Failed to call Python AI server. url={}, error={}", pythonServerUrl, e.toString());
-            throw e;
-        }
+        // This method is deprecated.
+        throw new UnsupportedOperationException("This method is deprecated.");
     }
 
     @Override
-    public Map<String, Object> saveAiResult(Map<String, Object> payload) throws IOException {
-        // payload: { userId, modelName, result: [ {class, probability}, ... ] }
+    public Map<String, Object> saveAiResult(Map<String, Object> payload, MultipartFile imageFile) throws IOException {
         ObjectMapper om = new ObjectMapper();
-        String rawJson = om.writeValueAsString(payload);
+        String rawJsonResult = om.writeValueAsString(payload.get("result"));
 
         Long userId = null;
         String modelName = null;
         try {
             Object uid = payload.get("userId");
             if (uid != null) userId = Long.valueOf(uid.toString());
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+            log.warn("Could not parse userId from payload");
+        }
         Object mn = payload.get("modelName");
         if (mn != null) modelName = mn.toString();
 
-        DiagnosisHistory history = new DiagnosisHistory(userId, modelName, rawJson, LocalDateTime.now());
+        byte[] imageData = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imageData = imageFile.getBytes();
+        }
+
+        DiagnosisHistory history = new DiagnosisHistory(userId, modelName, rawJsonResult, LocalDateTime.now(), imageData);
         diagnosisHistoryRepository.save(history);
 
         Map<String, Object> ret = new HashMap<>();
@@ -179,7 +141,7 @@ public class DiagnosisServiceImpl implements DiagnosisService {
         out.put("id", dh.getId());
         out.put("userId", dh.getUserId());
         out.put("modelName", dh.getModelName());
-        out.put("imagePath", dh.getImagePath());
+        out.put("imageData", dh.getImageData());
         out.put("createdAt", dh.getCreatedAt() != null ? dh.getCreatedAt().toString() : null);
         // Try to parse result JSON into structure; if fails, include raw string
         String raw = dh.getResult();

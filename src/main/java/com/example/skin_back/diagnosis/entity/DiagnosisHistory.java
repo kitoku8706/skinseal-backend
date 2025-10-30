@@ -10,38 +10,35 @@ public class DiagnosisHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String imagePath;
+    @Lob
+    @Column(name = "image_data", columnDefinition="LONGBLOB")
+    private byte[] imageData;
 
     // 새 필드: 사용자 ID
     private Long userId;
 
     // 새 필드: 사용된 모델명
-    private String modelName;    @Column(columnDefinition = "TEXT")
+    private String modelName;    
+    @Column(columnDefinition = "TEXT")
     private String result;
 
     private LocalDateTime createdAt;
 
     public DiagnosisHistory() {}
 
-    // 기존 이미지 업로드 흐름용 생성자
-    public DiagnosisHistory(String imagePath, String result, LocalDateTime createdAt) {
-        this.imagePath = imagePath;
-        this.result = result;
-        this.createdAt = createdAt;
-    }
-
-    // JSON 저장 흐름용 생성자
-    public DiagnosisHistory(Long userId, String modelName, String result, LocalDateTime createdAt) {
+    // JSON 및 이미지 데이터 저장 흐름용 생성자
+    public DiagnosisHistory(Long userId, String modelName, String result, LocalDateTime createdAt, byte[] imageData) {
         this.userId = userId;
         this.modelName = modelName;
         this.result = result;
         this.createdAt = createdAt;
+        this.imageData = imageData;
     }
 
     public Long getId() { return id; }
 
-    public String getImagePath() { return imagePath; }
-    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
+    public byte[] getImageData() { return imageData; }
+    public void setImageData(byte[] imageData) { this.imageData = imageData; }
 
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }

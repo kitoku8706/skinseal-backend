@@ -45,10 +45,13 @@ public class DiagnosisController {
     }
 
     // Python AI 서버가 직접 저장을 위해 호출하는 엔드포인트
-    @PostMapping
-    public ResponseEntity<?> saveDiagnosisFromAi(@RequestBody Map<String, Object> payload) {
+    @PostMapping(consumes = { "multipart/form-data" })
+    public ResponseEntity<?> saveDiagnosisFromAi(
+            @RequestPart("payload") Map<String, Object> payload,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile
+    ) {
         try {
-            Map<String, Object> saved = diagnosisService.saveAiResult(payload);
+            Map<String, Object> saved = diagnosisService.saveAiResult(payload, imageFile);
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
             return ResponseEntity.status(400).body(Map.of(

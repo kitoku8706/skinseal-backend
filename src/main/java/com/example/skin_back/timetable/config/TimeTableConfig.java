@@ -13,8 +13,9 @@ public class TimeTableConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         
-        // ✅ React 개발 서버 주소 (CORS 허용)
+        // React 개발 서버 및 프론트 배포 서버 주소 허용
         config.addAllowedOriginPattern("http://localhost:*");
+        config.addAllowedOrigin("http://98.87.24.151");
         // ✅ 모든 요청 헤더 허용
         config.addAllowedHeader("*");
         
